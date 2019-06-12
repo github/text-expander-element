@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>text-expander demo</title>
+</head>
+<body>
+  <text-expander keys=":">
+    <textarea autofocus></textarea>
+  </text-expander>
+
+  <script type="text/javascript">
+    const expander = document.querySelector('text-expander')
+    expander.addEventListener('text-expander-change', event => {
+      const {key, provide} = event.detail
+      if (key === ':') {
+        const menu = document.createElement('ul')
+        const item = document.createElement('li')
+        item.role = 'option'
+        item.textContent = '🐈'
+        menu.append(item)
+        provide(Promise.resolve({matched: true, fragment: menu}))
+      }
+    })
+    expander.addEventListener('text-expander-value', function(event) {
+      const {key, item}  = event.detail
+      if (key === ':') {
+        event.detail.value = '🐈'
+      }
+    })
+  </script>
+  <script type="text/javascript" src="https://unpkg.com/@github/combobox-nav@latest"></script>
+  <script type="text/javascript" src="https://unpkg.com/@github/text-expander-element@latest"></script>
+  <!-- <script src="../dist/index.umd.js"></script> -->
+</body>
+</html>
+
