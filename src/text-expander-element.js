@@ -23,8 +23,10 @@ class TextExpander {
   onpaste: EventHandler
   oncommit: EventHandler
   onblur: EventHandler
+  onmousedown: EventHandler
   match: ?Match
   justPasted: boolean
+  interactingWithList: boolean
 
   constructor(expander: TextExpanderElement, input: HTMLInputElement | HTMLTextAreaElement) {
     this.expander = expander
@@ -34,7 +36,9 @@ class TextExpander {
     this.onpaste = this.onPaste.bind(this)
     this.onkeydown = this.onKeydown.bind(this)
     this.oncommit = this.onCommit.bind(this)
+    this.onmousedown = this.onMousedown.bind(this)
     this.onblur = this.onBlur.bind(this)
+    this.interactingWithList = false
     input.addEventListener('paste', this.onpaste)
     input.addEventListener('input', this.oninput)
     input.addEventListener('keydown', this.onkeydown)
@@ -65,6 +69,7 @@ class TextExpander {
 
     installCombobox(this.input, menu)
     menu.addEventListener('combobox-commit', this.oncommit)
+    menu.addEventListener('mousedown', this.onmousedown)
 
     // Focus first menu item.
     clearSelection(this.input, menu)
@@ -77,6 +82,7 @@ class TextExpander {
     this.menu = null
 
     menu.removeEventListener('combobox-commit', this.oncommit)
+    menu.removeEventListener('mousedown', this.onmousedown)
     uninstallCombobox(this.input, menu)
 
     this.input.removeAttribute('aria-owns')
@@ -111,8 +117,12 @@ class TextExpander {
   }
 
   onBlur() {
-    // Hide menu after click selection.
-    setTimeout(this.deactivate.bind(this), 100)
+    if (this.interactingWithList) {
+      this.interactingWithList = false
+      return
+    }
+
+    this.deactivate()
   }
 
   onPaste() {
@@ -166,6 +176,10 @@ class TextExpander {
     const all = await Promise.all(providers)
     const fragments = all.filter(x => x.matched).map(x => x.fragment)
     return fragments[0]
+  }
+
+  onMousedown() {
+    this.interactingWithList = true
   }
 
   onKeydown(event: KeyboardEvent) {
