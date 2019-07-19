@@ -1,6 +1,6 @@
 {
   "name": "@github/text-expander-element",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Activates a suggestion menu to expand text snippets as you type.",
   "repository": "github/text-expander-element",
   "main": "dist/index.umd.js",
