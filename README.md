@@ -26,25 +26,52 @@ import '@github/text-expander-element'
 
 ## Events
 
+**`text-expander-change`** is fired when a key is matched. In `event.detail` you can find:
+
+- `key`: The matched key; for example: `:`.
+- `text`: The matched text; for example: `cat`, for `:cat`.
+- `provider`: A function to be called when you have the menu results. Takes a `Promise` with `{matched: boolean, fragment: HTMLElement}` where `matched` tells the element whether a suggestion is available, and `fragment` is the menu content to be displayed on the page.
+
 ```js
 const expander = document.querySelector('text-expander')
 
 expander.addEventListener('text-expander-change', function(event) {
-  const {key, provide} = event.detail
-  if (key === ':') {
-    const menu = document.createElement('ul')
-    const item = document.createElement('li')
-    item.textContent = '🐈'
-    item.role = 'option'
-    menu.append(item)
-    provide(Promise.resolve({matched: true, fragment: menu}))
+  const {key, provide, text} = event.detail
+  if (key !== ':') return
+
+  const suggestions = document.querySelector('.emoji-suggestions').cloneNode(true)
+  suggestions.hidden = false
+  for (const suggestion of suggestions.children) {
+    if (!suggestion.textContent.match(text)) {
+      suggestion.remove()
+    }
   }
+  provide(Promise.resolve({matched: suggestions.childElementCount > 0, fragment: suggestions}))
 })
+```
+
+The returned fragment should be consisted of filtered `[role=option]` items to be selected. For example:
+
+```html
+<ul class="emoji-suggestions" hidden>
+  <li role="option" data-value="🐈">🐈 :cat2:</li>
+  <li role="option" data-value="🐕">🐕 :dog:</li>
+</ul>
+```
+
+**`text-expander-value`** is fired when an item is selected. In `event.detail` you can find:
+
+- `key`: The matched key; for example: `:`.
+- `item`: The matched text; for example: `cat`, for `:cat`.
+- `value`: A null value placeholder to replace the query. To replace the text query, simply re-assign this value.
+
+```js
+const expander = document.querySelector('text-expander')
 
 expander.addEventListener('text-expander-value', function(event) {
   const {key, item}  = event.detail
   if (key === ':') {
-    event.detail.value = '🐈'
+    event.detail.value = item.getAttribute('data-value')
   }
 })
 ```
