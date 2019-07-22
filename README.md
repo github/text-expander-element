@@ -62,7 +62,7 @@ The returned fragment should be consisted of filtered `[role=option]` items to b
 **`text-expander-value`** is fired when an item is selected. In `event.detail` you can find:
 
 - `key`: The matched key; for example: `:`.
-- `item`: The matched text; for example: `cat`, for `:cat`.
+- `item`: The selected item. This would be one of the `[role=option]`. Use this to work out the `value`.
 - `value`: A null value placeholder to replace the query. To replace the text query, simply re-assign this value.
 
 ```js
