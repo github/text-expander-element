@@ -16,7 +16,7 @@
       if (key === ':') {
         const menu = document.createElement('ul')
         const item = document.createElement('li')
-        item.role = 'option'
+        item.setAttribute('role', 'option')
         item.textContent = '🐈'
         menu.append(item)
         provide(Promise.resolve({matched: true, fragment: menu}))
@@ -34,4 +34,3 @@
   <!-- <script src="../dist/index.umd.js"></script> -->
 </body>
 </html>
-
