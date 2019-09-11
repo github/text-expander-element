@@ -5,6 +5,7 @@
   "repository": "github/text-expander-element",
   "main": "dist/index.umd.js",
   "module": "dist/index.esm.js",
+  "types": "index.d.ts",
   "scripts": {
     "clean": "rm -rf dist build",
     "lint": "github-lint",
@@ -22,7 +23,8 @@
   ],
   "license": "MIT",
   "files": [
-    "dist"
+    "dist",
+    "index.d.ts"
   ],
   "dependencies": {
     "@github/combobox-nav": "^0.3.0"
