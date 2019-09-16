@@ -30,7 +30,7 @@ import '@github/text-expander-element'
 
 - `key`: The matched key; for example: `:`.
 - `text`: The matched text; for example: `cat`, for `:cat`.
-- `provider`: A function to be called when you have the menu results. Takes a `Promise` with `{matched: boolean, fragment: HTMLElement}` where `matched` tells the element whether a suggestion is available, and `fragment` is the menu content to be displayed on the page.
+- `provide`: A function to be called when you have the menu results. Takes a `Promise` with `{matched: boolean, fragment: HTMLElement}` where `matched` tells the element whether a suggestion is available, and `fragment` is the menu content to be displayed on the page.
 
 ```js
 const expander = document.querySelector('text-expander')
