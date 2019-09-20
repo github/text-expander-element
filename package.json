@@ -27,7 +27,7 @@
     "index.d.ts"
   ],
   "dependencies": {
-    "@github/combobox-nav": "^0.3.3"
+    "@github/combobox-nav": "^1.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.6.0",
