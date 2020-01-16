@@ -6,4 +6,7 @@ declare global {
   interface Window {
     TextExpanderElement: typeof TextExpanderElement
   }
+  interface HTMLElementTagNameMap {
+    'text-expander': TextExpanderElement
+  }
 }
