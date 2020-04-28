@@ -1,11 +1,6 @@
 /* @flow strict */
 
-import {
-  clearSelection,
-  install as installCombobox,
-  navigate as navigateCombobox,
-  uninstall as uninstallCombobox
-} from '@github/combobox-nav'
+import Combobox from '@github/combobox-nav'
 import keyword from './keyword'
 import textFieldSelectionPosition from './text-field-selection-position'
 
@@ -24,6 +19,7 @@ class TextExpander {
   oncommit: EventHandler
   onblur: EventHandler
   onmousedown: EventHandler
+  combobox: Combobox
   match: ?Match
   justPasted: boolean
   interactingWithList: boolean
@@ -59,21 +55,19 @@ class TextExpander {
     this.menu = menu
 
     if (!menu.id) menu.id = `text-expander-${Math.floor(Math.random() * 100000).toString()}`
-    this.input.setAttribute('aria-owns', menu.id)
-
     this.expander.append(menu)
+    this.combobox = new Combobox(this.input, menu)
 
     const {top, left} = textFieldSelectionPosition(this.input, match.position)
     menu.style.top = `${top}px`
     menu.style.left = `${left}px`
 
-    installCombobox(this.input, menu)
+    this.combobox.start()
     menu.addEventListener('combobox-commit', this.oncommit)
     menu.addEventListener('mousedown', this.onmousedown)
 
     // Focus first menu item.
-    clearSelection(this.input, menu)
-    navigateCombobox(this.input, menu)
+    this.combobox.navigate(1)
   }
 
   deactivate() {
@@ -83,9 +77,7 @@ class TextExpander {
 
     menu.removeEventListener('combobox-commit', this.oncommit)
     menu.removeEventListener('mousedown', this.onmousedown)
-    uninstallCombobox(this.input, menu)
-
-    this.input.removeAttribute('aria-owns')
+    this.combobox.destroy()
     menu.remove()
   }
 

@@ -16,7 +16,7 @@ export default {
       file: pkg['main'],
       format: 'umd',
       globals: {
-        '@github/combobox-nav': 'comboboxNav'
+        '@github/combobox-nav': 'Combobox'
       },
       name: 'TextExpanderElement',
       exports: 'named'
