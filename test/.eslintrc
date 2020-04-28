@@ -1,0 +1,12 @@
+{
+  "parser": "espree",
+  "parserOptions": {
+    "ecmaVersion": 8
+  },
+  "env": {
+    "mocha": true
+  },
+  "globals": {
+    "assert": true
+  }
+}

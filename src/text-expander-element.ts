@@ -1,33 +1,42 @@
-/* @flow strict */
-
 import Combobox from '@github/combobox-nav'
 import keyword from './keyword'
 import textFieldSelectionPosition from './text-field-selection-position'
 
-type Match = {text: string, key: string, position: number}
-type Result = {fragment: HTMLElement, matched: boolean}
+type Match = {
+  text: string
+  key: string
+  position: number
+}
+
+type Result = {
+  fragment: HTMLElement
+  matched: boolean
+}
 
 const states = new WeakMap()
 
 class TextExpander {
   expander: TextExpanderElement
   input: HTMLInputElement | HTMLTextAreaElement
-  menu: ?HTMLElement
-  oninput: EventHandler
-  onkeydown: EventHandler
-  onpaste: EventHandler
-  oncommit: EventHandler
-  onblur: EventHandler
-  onmousedown: EventHandler
-  combobox: Combobox
-  match: ?Match
+  menu: HTMLElement | null
+  oninput: (event: Event) => void
+  onkeydown: (event: KeyboardEvent) => void
+  onpaste: (event: Event) => void
+  oncommit: (event: Event) => void
+  onblur: (event: Event) => void
+  onmousedown: (event: Event) => void
+  combobox: Combobox | null
+  match: Match | null
   justPasted: boolean
   interactingWithList: boolean
 
   constructor(expander: TextExpanderElement, input: HTMLInputElement | HTMLTextAreaElement) {
     this.expander = expander
     this.input = input
+    this.combobox = null
     this.menu = null
+    this.match = null
+    this.justPasted = false
     this.oninput = this.onInput.bind(this)
     this.onpaste = this.onPaste.bind(this)
     this.onkeydown = this.onKeydown.bind(this)
@@ -37,14 +46,14 @@ class TextExpander {
     this.interactingWithList = false
     input.addEventListener('paste', this.onpaste)
     input.addEventListener('input', this.oninput)
-    input.addEventListener('keydown', this.onkeydown)
+    ;(input as HTMLElement).addEventListener('keydown', this.onkeydown)
     input.addEventListener('blur', this.onblur)
   }
 
   destroy() {
     this.input.removeEventListener('paste', this.onpaste)
     this.input.removeEventListener('input', this.oninput)
-    this.input.removeEventListener('keydown', this.onkeydown)
+    ;(this.input as HTMLElement).removeEventListener('keydown', this.onkeydown)
     this.input.removeEventListener('blur', this.onblur)
   }
 
@@ -72,7 +81,7 @@ class TextExpander {
 
   deactivate() {
     const menu = this.menu
-    if (!menu) return
+    if (!menu || !this.combobox) return
     this.menu = null
 
     menu.removeEventListener('combobox-commit', this.oncommit)
@@ -84,6 +93,7 @@ class TextExpander {
   onCommit({target}: Event) {
     const item = target
     if (!(item instanceof HTMLElement)) return
+    if (!this.combobox) return
 
     const match = this.match
     if (!match) return
@@ -146,19 +156,19 @@ class TextExpander {
     }
   }
 
-  findMatch(): ?Match {
+  findMatch(): Match | void {
     const cursor = this.input.selectionEnd
     const text = this.input.value
     for (const key of this.expander.keys) {
-      const found = keyword(text, key, cursor)
+      const found = keyword(text, key, cursor!)
       if (found) {
         return {text: found.word, key, position: found.position}
       }
     }
   }
 
-  async notifyProviders(match: Match): Promise<?HTMLElement> {
-    const providers = []
+  async notifyProviders(match: Match): Promise<HTMLElement | void> {
+    const providers: Array<Promise<Result> | Result> = []
     const provide = (result: Promise<Result> | Result) => providers.push(result)
     const canceled = !this.expander.dispatchEvent(
       new CustomEvent('text-expander-change', {cancelable: true, detail: {provide, text: match.text, key: match.key}})
@@ -183,7 +193,7 @@ class TextExpander {
 }
 
 export default class TextExpanderElement extends HTMLElement {
-  get keys(): Array<string> {
+  get keys(): string[] {
     const keys = this.getAttribute('keys')
     return keys ? keys.split(' ') : []
   }

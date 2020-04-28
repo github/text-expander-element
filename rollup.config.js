@@ -1,12 +1,8 @@
-/* @flow strict */
-
-import babel from 'rollup-plugin-babel'
-import resolve from 'rollup-plugin-node-resolve'
-
 const pkg = require('./package.json')
+const resolve = require('rollup-plugin-node-resolve')
 
 export default {
-  input: 'src/index.js',
+  input: 'dist/index.js',
   output: [
     {
       file: pkg['module'],
@@ -15,18 +11,9 @@ export default {
     {
       file: pkg['main'],
       format: 'umd',
-      globals: {
-        '@github/combobox-nav': 'Combobox'
-      },
       name: 'TextExpanderElement',
       exports: 'named'
     }
   ],
-  external: '@github/combobox-nav',
-  plugins: [
-    resolve(),
-    babel({
-      presets: ['github']
-    })
-  ]
+  plugins: [resolve()]
 }
