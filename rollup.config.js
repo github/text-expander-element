@@ -1,19 +1,22 @@
 const pkg = require('./package.json')
 const resolve = require('rollup-plugin-node-resolve')
 
-export default {
-  input: 'dist/index.js',
-  output: [
-    {
+export default [
+  {
+    external: ['@github/combobox-nav'],
+    input: 'dist/index.js',
+    output: {
       file: pkg['module'],
       format: 'es'
     },
-    {
-      file: pkg['main'],
-      format: 'umd',
-      name: 'TextExpanderElement',
-      exports: 'named'
-    }
-  ],
-  plugins: [resolve()]
-}
+    plugins: [resolve()]
+  },
+  {
+    input: 'dist/index.js',
+    output: {
+      file: pkg['browser'],
+      format: 'es',
+    },
+    plugins: [resolve()]
+  }
+]

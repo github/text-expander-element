@@ -3,8 +3,10 @@
   "version": "1.0.2",
   "description": "Activates a suggestion menu to expand text snippets as you type.",
   "repository": "github/text-expander-element",
-  "main": "dist/index.umd.js",
-  "module": "dist/index.esm.js",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "browser": "dist/browser.js",
+  "type": "module",
   "types": "index.d.ts",
   "scripts": {
     "clean": "rm -rf dist build",
@@ -13,7 +15,7 @@
     "prebuild": "npm run clean && npm run lint && npm run compile",
     "build": "rollup -c",
     "pretest": "npm run build && rollup -c rollup.config.test.js",
-    "test": "karma start test/karma.config.js",
+    "test": "karma start test/karma.config.cjs",
     "prepublishOnly": "npm run build",
     "postpublish": "npm publish --ignore-scripts --@github:registry='https://npm.pkg.github.com'"
   },
@@ -26,10 +28,12 @@
   "files": [
     "dist"
   ],
+  "prettier": "@github/prettier-config",
   "dependencies": {
     "@github/combobox-nav": "^2.0.0"
   },
   "devDependencies": {
+    "@github/prettier-config": "0.0.4",
     "chai": "^4.2.0",
     "eslint": "^6.6.0",
     "eslint-plugin-github": "^3.4.1",

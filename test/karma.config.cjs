@@ -1,7 +1,7 @@
 module.exports = function(config) {
   config.set({
     frameworks: ['mocha', 'chai'],
-    files: ['../dist/index.umd.js', '../build/test.js'],
+    files: [{pattern: '../dist/browser.js', type: 'module'}, '../build/test.js'],
     reporters: ['mocha'],
     port: 9876,
     colors: true,
