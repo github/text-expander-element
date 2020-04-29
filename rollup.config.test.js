@@ -5,12 +5,9 @@ export default {
   output: [
     {
       file: 'build/test.js',
-      format: 'umd',
-      name: 'TextExpanderElement',
-      exports: 'named'
+      format: 'es',
     }
   ],
-  external: '@github/combobox-nav',
   plugins: [
     resolve()
   ]
