@@ -3,10 +3,10 @@
   "version": "1.0.2",
   "description": "Activates a suggestion menu to expand text snippets as you type.",
   "repository": "github/text-expander-element",
+  "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
-  "type": "module",
-  "types": "index.d.ts",
+  "types": "dist/index.d.ts",
   "scripts": {
     "clean": "rm -rf dist build",
     "compile": "tsc",
