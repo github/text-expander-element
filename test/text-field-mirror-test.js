@@ -1,4 +1,4 @@
-import textFieldMirror from '../src/text-field-mirror'
+import textFieldMirror from '../dist/text-field-mirror'
 
 describe('textFieldMirror', function() {
   let textarea

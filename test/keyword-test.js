@@ -1,4 +1,4 @@
-import keyword from '../src/keyword'
+import keyword from '../dist/keyword'
 
 describe('text-expander keyword parsing', function() {
   it('does not match empty text', function() {

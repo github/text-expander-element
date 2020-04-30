@@ -2,8 +2,11 @@
   "extends": [
     "plugin:github/browser",
     "plugin:github/es6",
-    "plugin:github/flow"
+    "plugin:github/typescript"
   ],
+  "globals": {
+    "TextExpanderElement": "readable"
+  },
   "rules": {
     "no-invalid-this": "off"
   },
@@ -11,7 +14,6 @@
     {
       "files": "test/**/*.js",
       "rules": {
-        "flowtype/require-valid-file-annotation": "off",
         "github/unescaped-html-literal": "off"
       }
     },

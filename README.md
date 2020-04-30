@@ -10,9 +10,21 @@ $ npm install --save @github/text-expander-element
 
 ## Usage
 
+### Script
+
+Import as ES modules:
+
 ```js
 import '@github/text-expander-element'
 ```
+
+With a script tag:
+
+```html
+<script type="module" src="./node_modules/@github/text-expander-element/dist/bundle.js">
+```
+
+### Markup
 
 ```html
 <text-expander keys=": @ #">

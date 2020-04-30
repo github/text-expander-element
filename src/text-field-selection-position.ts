@@ -1,5 +1,3 @@
-/* @flow strict */
-
 import textFieldMirror from './text-field-mirror'
 
 // Get offset position of cursor in a `textField` field. The offset is the
@@ -16,8 +14,8 @@ import textFieldMirror from './text-field-mirror'
 // Returns object with {top, left} properties.
 export default function textFieldSelectionPosition(
   field: HTMLInputElement | HTMLTextAreaElement,
-  index: ?number = field.selectionEnd
-): {top: number, left: number} {
+  index: number | null = field.selectionEnd
+): {top: number; left: number} {
   const {mirror, marker} = textFieldMirror(field, index)
 
   const mirrorRect = mirror.getBoundingClientRect()

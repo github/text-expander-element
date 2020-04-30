@@ -1,4 +1,4 @@
-import textFieldMirror from '../src/text-field-mirror'
+import textFieldMirror from '../dist/text-field-mirror'
 
 function textareaContentsHeight(textarea) {
   const {mirror} = textFieldMirror(textarea)

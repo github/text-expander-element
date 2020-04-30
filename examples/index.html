@@ -3,10 +3,13 @@
 <head>
   <meta charset="utf-8">
   <title>text-expander demo</title>
+  <style>
+    [aria-selected="true"] {background: #eee;}
+  </style>
 </head>
 <body>
   <text-expander keys=":">
-    <textarea autofocus></textarea>
+    <textarea autofocus rows="10" cols="40"></textarea>
   </text-expander>
 
   <script type="text/javascript">
@@ -15,22 +18,24 @@
       const {key, provide} = event.detail
       if (key === ':') {
         const menu = document.createElement('ul')
-        const item = document.createElement('li')
-        item.setAttribute('role', 'option')
-        item.textContent = '🐈'
-        menu.append(item)
+        menu.role = 'listbox'
+        for (const emoji of ['🐈', '🐕']) {
+          const item = document.createElement('li')
+          item.setAttribute('role', 'option')
+          item.textContent = emoji
+          item.id = `option-${emoji}`
+          menu.append(item)
+        }
         provide(Promise.resolve({matched: true, fragment: menu}))
       }
     })
+
     expander.addEventListener('text-expander-value', function(event) {
       const {key, item}  = event.detail
-      if (key === ':') {
-        event.detail.value = '🐈'
-      }
+      if (key === ':') event.detail.value = item.textContent
     })
   </script>
-  <script type="text/javascript" src="https://unpkg.com/@github/combobox-nav@latest"></script>
-  <script type="text/javascript" src="https://unpkg.com/@github/text-expander-element@latest"></script>
-  <!-- <script src="../dist/index.umd.js"></script> -->
+  <script type="module" src="https://unpkg.com/@github/text-expander-element@latest/dist/bundle.js"></script>
+  <!-- <script src="../dist/bundle.js" type="module"></script> -->
 </body>
 </html>

@@ -1,11 +1,12 @@
-/* @flow strict */
-
-type Keyword = {word: string, position: number}
+type Keyword = {
+  word: string
+  position: number
+}
 
 const boundary = /\s|\(|\[/
 
 // Extracts a keyword from the source text, backtracking from the cursor position.
-export default function keyword(text: string, key: string, cursor: number): ?Keyword {
+export default function keyword(text: string, key: string, cursor: number): Keyword | void {
   // Activation key not found in front of the cursor.
   const keyIndex = text.lastIndexOf(key, cursor - 1)
   if (keyIndex === -1) return

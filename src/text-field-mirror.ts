@@ -1,5 +1,3 @@
-/* @flow strict */
-
 const properties = ['position:absolute;', 'overflow:auto;', 'word-wrap:break-word;', 'top:0px;', 'left:-9999px;']
 
 // Copy CSS properties from text field to div that would affect the cursor position.
@@ -44,8 +42,8 @@ const mirrorMap = new WeakMap()
 // finished with their measurements.
 export default function textFieldMirror(
   textField: HTMLInputElement | HTMLTextAreaElement,
-  markerPosition: ?number
-): {mirror: HTMLElement, marker: HTMLElement} {
+  markerPosition: number | null
+): {mirror: HTMLElement; marker: HTMLElement} {
   const nodeName = textField.nodeName.toLowerCase()
   if (nodeName !== 'textarea' && nodeName !== 'input') {
     throw new Error('expected textField to a textarea or input')
