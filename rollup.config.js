@@ -14,7 +14,7 @@ export default [
   {
     input: 'dist/index.js',
     output: {
-      file: pkg['browser'],
+      file: 'dist/bundle.js',
       format: 'es',
     },
     plugins: [resolve()]

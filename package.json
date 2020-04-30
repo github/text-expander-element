@@ -5,7 +5,6 @@
   "repository": "github/text-expander-element",
   "main": "dist/index.js",
   "module": "dist/index.js",
-  "browser": "dist/browser.js",
   "type": "module",
   "types": "index.d.ts",
   "scripts": {
