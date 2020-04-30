@@ -30,7 +30,7 @@
   ],
   "prettier": "@github/prettier-config",
   "dependencies": {
-    "@github/combobox-nav": "^2.0.0"
+    "@github/combobox-nav": "^2.0.1"
   },
   "devDependencies": {
     "@github/prettier-config": "0.0.4",
