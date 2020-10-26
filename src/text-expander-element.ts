@@ -90,10 +90,8 @@ class TextExpander {
     menu.remove()
   }
 
-  onCommit({target}: Event) {
-    const item = target
-    if (!(item instanceof HTMLElement)) return
-    if (!this.combobox) return
+  setValue(value: String | null) {
+    if (!value) return
 
     const match = this.match
     if (!match) return
@@ -101,13 +99,7 @@ class TextExpander {
     const beginning = this.input.value.substring(0, match.position - match.key.length)
     const remaining = this.input.value.substring(match.position + match.text.length)
 
-    const detail = {item, key: match.key, value: null}
-    const canceled = !this.expander.dispatchEvent(new CustomEvent('text-expander-value', {cancelable: true, detail}))
-    if (canceled) return
-
-    if (!detail.value) return
-    const value = `${detail.value} `
-
+    value = `${value} `
     this.input.value = beginning + value + remaining
 
     this.deactivate()
@@ -116,6 +108,21 @@ class TextExpander {
     const cursor = beginning.length + value.length
     this.input.selectionStart = cursor
     this.input.selectionEnd = cursor
+  }
+
+  onCommit({target}: Event) {
+    const item = target
+    if (!(item instanceof HTMLElement)) return
+    if (!this.combobox) return
+
+    const match = this.match
+    if (!match) return
+
+    const detail = {item, key: match.key, value: null}
+    const canceled = !this.expander.dispatchEvent(new CustomEvent('text-expander-value', {cancelable: true, detail}))
+
+    if (canceled) return
+    if (detail.value) this.setValue(detail.value)
   }
 
   onBlur() {
@@ -210,5 +217,18 @@ export default class TextExpanderElement extends HTMLElement {
     if (!state) return
     state.destroy()
     states.delete(this)
+  }
+
+  setValue(value: String) {
+    const state = states.get(this)
+    if (!state) return
+    state.setValue(value)
+  }
+
+  setMenu(menu: HTMLElement) {
+    const state = states.get(this)
+    if (!state) return
+    if (!state.match) return
+    state.activate(state.match, menu)
   }
 }
