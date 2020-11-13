@@ -1,41 +1,60 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>text-expander demo</title>
-  <style>
-    [aria-selected="true"] {background: #eee;}
-  </style>
-</head>
-<body>
-  <text-expander keys=":">
-    <textarea autofocus rows="10" cols="40"></textarea>
-  </text-expander>
-
-  <script type="text/javascript">
-    const expander = document.querySelector('text-expander')
-    expander.addEventListener('text-expander-change', event => {
-      const {key, provide} = event.detail
-      if (key === ':') {
-        const menu = document.createElement('ul')
-        menu.role = 'listbox'
-        for (const emoji of ['🐈', '🐕']) {
-          const item = document.createElement('li')
-          item.setAttribute('role', 'option')
-          item.textContent = emoji
-          item.id = `option-${emoji}`
-          menu.append(item)
-        }
-        provide(Promise.resolve({matched: true, fragment: menu}))
+  <head>
+    <meta charset="utf-8" />
+    <title>text-expander demo</title>
+    <style>
+      [aria-selected='true'] {
+        background: #eee;
       }
-    })
+    </style>
+  </head>
+  <body>
+    <h1>text-expanded element examples</h1>
+    <p>Use <code>#</code> to trigger the expander</p>
 
-    expander.addEventListener('text-expander-value', function(event) {
-      const {key, item}  = event.detail
-      if (key === ':') event.detail.value = item.textContent
-    })
-  </script>
-  <script type="module" src="https://unpkg.com/@github/text-expander-element@latest/dist/bundle.js"></script>
-  <!-- <script src="../dist/bundle.js" type="module"></script> -->
-</body>
+    <h2>Normal text-expander element</h2>
+    <text-expander keys="#">
+      <textarea autofocus rows="10" cols="40"></textarea>
+    </text-expander>
+
+    <h2>Multiword text-expander element</h2>
+    <text-expander keys="#" multiword>
+      <textarea autofocus rows="10" cols="40"></textarea>
+    </text-expander>
+
+    <script type="text/javascript">
+      const expanders = document.querySelectorAll('text-expander')
+      for (const expander of expanders) {
+        expander.addEventListener('text-expander-change', event => {
+          const {key, provide, text} = event.detail
+          if (key === '#') {
+            const menu = document.createElement('ul')
+            menu.role = 'listbox'
+            for (const issue of [
+              '#1 Implement a text-expander element',
+              '#2 Implement multi word option',
+              '#3 Fix tpoy'
+            ]) {
+              if (issue.toLowerCase().includes(text.toLowerCase())) {
+                const item = document.createElement('li')
+                item.setAttribute('role', 'option')
+                item.textContent = issue
+                item.id = `option-${issue}`
+                menu.append(item)
+              }
+            }
+            provide(Promise.resolve({matched: true, fragment: menu}))
+          }
+        })
+
+        expander.addEventListener('text-expander-value', function(event) {
+          const {key, item} = event.detail
+          if (key === '#') event.detail.value = item.textContent
+        })
+      }
+    </script>
+    <script type="module" src="https://unpkg.com/@github/text-expander-element@latest/dist/bundle.js"></script>
+    <!-- <script src="../dist/bundle.js" type="module"></script> -->
+  </body>
 </html>

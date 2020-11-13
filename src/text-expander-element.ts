@@ -1,5 +1,5 @@
 import Combobox from '@github/combobox-nav'
-import keyword from './keyword'
+import query from './query'
 import textFieldSelectionPosition from './text-field-selection-position'
 
 type Match = {
@@ -27,16 +27,18 @@ class TextExpander {
   onmousedown: (event: Event) => void
   combobox: Combobox | null
   match: Match | null
+  multiWord: boolean
   justPasted: boolean
   interactingWithList: boolean
 
-  constructor(expander: TextExpanderElement, input: HTMLInputElement | HTMLTextAreaElement) {
+  constructor(expander: TextExpanderElement, input: HTMLInputElement | HTMLTextAreaElement, multiWord = false) {
     this.expander = expander
     this.input = input
     this.combobox = null
     this.menu = null
     this.match = null
     this.justPasted = false
+    this.multiWord = multiWord
     this.oninput = this.onInput.bind(this)
     this.onpaste = this.onPaste.bind(this)
     this.onkeydown = this.onKeydown.bind(this)
@@ -160,9 +162,9 @@ class TextExpander {
     const cursor = this.input.selectionEnd
     const text = this.input.value
     for (const key of this.expander.keys) {
-      const found = keyword(text, key, cursor!)
+      const found = query(text, key, cursor!, this.multiWord)
       if (found) {
-        return {text: found.word, key, position: found.position}
+        return {text: found.text, key, position: found.position}
       }
     }
   }
@@ -201,7 +203,8 @@ export default class TextExpanderElement extends HTMLElement {
   connectedCallback() {
     const input = this.querySelector('input[type="text"], textarea')
     if (!(input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement)) return
-    const state = new TextExpander(this, input)
+    const multiWord = this.hasAttribute('multiword')
+    const state = new TextExpander(this, input, multiWord)
     states.set(this, state)
   }
 

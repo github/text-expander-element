@@ -35,6 +35,7 @@ With a script tag:
 ## Attributes
 
 - `keys` is a space separated list of menu activation keys
+- `multiword` defines whether the expansion should user several words or not
 
 ## Events
 
