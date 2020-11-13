@@ -58,6 +58,11 @@ describe('text-expander single word parsing', function() {
 })
 
 describe('text-expander multi word parsing', function() {
+  it('does not match empty text', function() {
+    const found = query('', ':', 0, true)
+    assert(found == null)
+  })
+
   it('does not match without activation key', function() {
     const found = query('cat', ':', 3, true)
     assert(found == null)
@@ -73,18 +78,33 @@ describe('text-expander multi word parsing', function() {
     assert.deepEqual(found, {text: '', position: 4})
   })
 
+  it('matches start of text', function() {
+    const found = query(':cat', ':', 4, true)
+    assert.deepEqual(found, {text: 'cat', position: 1})
+  })
+
+  it('matches end of text', function() {
+    const found = query('hi :cat', ':', 7, true)
+    assert.deepEqual(found, {text: 'cat', position: 4})
+  })
+
+  it('matches middle of text', function() {
+    const found = query('hi :cat bye', ':', 7, true)
+    assert.deepEqual(found, {text: 'cat', position: 4})
+  })
+
   it('matches only at word boundary', function() {
-    const found = query('hi:cat', ':', 6)
+    const found = query('hi:cat', ':', 6, true)
     assert(found == null)
   })
 
   it('matches last activation key word', function() {
-    const found = query('hi :cat bye :dog', ':', 16)
+    const found = query('hi :cat bye :dog', ':', 16, true)
     assert.deepEqual(found, {text: 'dog', position: 13})
   })
 
   it('matches closest activation key word', function() {
-    const found = query('hi :cat bye :dog', ':', 7)
+    const found = query('hi :cat bye :dog', ':', 7, true)
     assert.deepEqual(found, {text: 'cat', position: 4})
   })
 
