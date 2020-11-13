@@ -113,6 +113,11 @@ describe('text-expander multi word parsing', function() {
     assert.deepEqual(found, {text: 'cat bye', position: 4})
   })
 
+  it('does not match with a dot between cursor and activation key', function() {
+    const found = query('hi :cat. bye', ':', 11, true)
+    assert(found == null)
+  })
+
   it('does not match with a space between text and activation key', function() {
     const found = query('hi : cat bye', ':', 7, true)
     assert(found == null)
