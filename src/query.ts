@@ -12,6 +12,10 @@ export default function query(text: string, key: string, cursor: number, multiWo
   if (keyIndex === -1) return
 
   if (multiWord) {
+    // Space immediately after activation key
+    const charAfterKey = text[keyIndex + 1]
+    if (charAfterKey === ' ') return
+
     // New line the cursor and previous activation key.
     const newLineIndex = text.lastIndexOf('\n', cursor - 1)
     if (newLineIndex > keyIndex) return
