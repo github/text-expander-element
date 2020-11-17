@@ -3,13 +3,23 @@ type Query = {
   position: number
 }
 
+type QueryOptions = {
+  cursor: number
+  lookBackIndex: number
+  multiWord: boolean
+}
+
 const boundary = /\s|\(|\[/
 
 // Extracts a keyword from the source text, backtracking from the cursor position.
-export default function query(text: string, key: string, cursor: number, multiWord = false): Query | void {
+export default function query(
+  text: string,
+  key: string,
+  {cursor, lookBackIndex, multiWord}: QueryOptions = {cursor: 0, lookBackIndex: 0, multiWord: false}
+): Query | void {
   // Activation key not found in front of the cursor.
   const keyIndex = text.lastIndexOf(key, cursor - 1)
-  if (keyIndex === -1) return
+  if (keyIndex === -1 || keyIndex < lookBackIndex) return
 
   if (multiWord) {
     // Space immediately after activation key

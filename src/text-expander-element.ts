@@ -29,6 +29,7 @@ class TextExpander {
   match: Match | null
   multiWord: boolean
   justPasted: boolean
+  lookBackIndex: number
   interactingWithList: boolean
 
   constructor(expander: TextExpanderElement, input: HTMLInputElement | HTMLTextAreaElement, multiWord = false) {
@@ -38,6 +39,7 @@ class TextExpander {
     this.menu = null
     this.match = null
     this.justPasted = false
+    this.lookBackIndex = 0
     this.multiWord = multiWord
     this.oninput = this.onInput.bind(this)
     this.onpaste = this.onPaste.bind(this)
@@ -118,6 +120,8 @@ class TextExpander {
     const cursor = beginning.length + value.length
     this.input.selectionStart = cursor
     this.input.selectionEnd = cursor
+
+    this.lookBackIndex = cursor
   }
 
   onBlur() {
@@ -159,10 +163,13 @@ class TextExpander {
   }
 
   findMatch(): Match | void {
-    const cursor = this.input.selectionEnd
+    const cursor = this.input.selectionEnd!
     const text = this.input.value
+    if (cursor <= this.lookBackIndex) {
+      this.lookBackIndex = 0
+    }
     for (const key of this.expander.keys) {
-      const found = query(text, key, cursor!, this.multiWord)
+      const found = query(text, key, {cursor, lookBackIndex: this.lookBackIndex, multiWord: this.multiWord})
       if (found) {
         return {text: found.text, key, position: found.position}
       }
