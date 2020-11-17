@@ -131,7 +131,7 @@ describe('text-expander limits the lookBack after commit', function() {
   })
 
   it('matches if lookBackIndex is lower than activation key index', function() {
-    const found = query('hi :cat bye :dog', ':', 11, {multiWord: true, lookBackIndex: 7})
+    const found = query('hi :cat bye :dog', ':', 16, {multiWord: true, lookBackIndex: 7})
     assert(found, {text: 'dog', position: 13})
   })
 })
