@@ -166,7 +166,7 @@ class TextExpander {
   }
 
   findMatch(): Match | void {
-    const cursor = this.input.selectionEnd!
+    const cursor = this.input.selectionEnd || 0
     const text = this.input.value
     if (cursor <= this.lookBackIndex) {
       this.lookBackIndex = 0
@@ -197,10 +197,11 @@ class TextExpander {
   }
 
   onKeydown(event: KeyboardEvent) {
-    if (event.key !== 'Escape') return
-    this.deactivate()
-    event.stopImmediatePropagation()
-    event.preventDefault()
+    if (event.key === 'Escape' && (this.menu || this.combobox)) {
+      this.deactivate()
+      event.stopImmediatePropagation()
+      event.preventDefault()
+    }
   }
 }
 
