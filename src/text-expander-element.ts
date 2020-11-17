@@ -209,11 +209,11 @@ export default class TextExpanderElement extends HTMLElement {
     const keysAttr = this.getAttribute('keys')
     const keys = keysAttr ? keysAttr.split(' ') : []
 
-    const hasMultiWord = this.hasAttribute('multiword')
     const multiWordAttr = this.getAttribute('multiword')
     const multiWord = multiWordAttr ? multiWordAttr.split(' ') : []
+    const globalMultiWord = multiWord.length === 0 && this.hasAttribute('multiword')
 
-    return keys.map(key => ({key, multiWord: multiWord.includes(key) || hasMultiWord}))
+    return keys.map(key => ({key, multiWord: globalMultiWord || multiWord.includes(key)}))
   }
 
   connectedCallback() {
