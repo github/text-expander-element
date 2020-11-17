@@ -162,7 +162,7 @@ class TextExpander {
     const cursor = this.input.selectionEnd
     const text = this.input.value
     for (const key of this.expander.keys) {
-      const found = query(text, key, cursor!, this.multiWord)
+      const found = query(text, key, cursor || 0, this.multiWord)
       if (found) {
         return {text: found.text, key, position: found.position}
       }
