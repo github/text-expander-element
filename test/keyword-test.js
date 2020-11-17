@@ -2,7 +2,7 @@ import query from '../dist/query'
 
 describe('text-expander single word parsing', function() {
   it('does not match empty text', function() {
-    const found = query('', ':')
+    const found = query('', ':', 0)
     assert(found == null)
   })
 
@@ -59,7 +59,7 @@ describe('text-expander single word parsing', function() {
 
 describe('text-expander multi word parsing', function() {
   it('does not match empty text', function() {
-    const found = query('', ':', {multiWord: true})
+    const found = query('', ':', 0, {multiWord: true})
     assert(found == null)
   })
 
