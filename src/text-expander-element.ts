@@ -187,10 +187,11 @@ class TextExpander {
   }
 
   onKeydown(event: KeyboardEvent) {
-    if (event.key !== 'Escape' && (!this.menu || !this.combobox)) return
-    this.deactivate()
-    event.stopImmediatePropagation()
-    event.preventDefault()
+    if (event.key === 'Escape' && (this.menu || this.combobox)) {
+      this.deactivate()
+      event.stopImmediatePropagation()
+      event.preventDefault()
+    }
   }
 }
 
