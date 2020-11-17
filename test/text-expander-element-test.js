@@ -75,7 +75,7 @@ describe('text-expander element', function() {
       )
     })
 
-    it('dispatches change event for multiword', async function() {
+    it('dispatches change event for multi-word', async function() {
       const expander = document.querySelector('text-expander')
       const input = expander.querySelector('textarea')
       const result = once(expander, 'text-expander-change')
@@ -86,7 +86,7 @@ describe('text-expander element', function() {
       assert.equal('some text', text)
     })
 
-    it('dispatches change event', async function() {
+    it('dispatches change event for single word match after multi-word', async function() {
       const expander = document.querySelector('text-expander')
       const input = expander.querySelector('textarea')
       const result = once(expander, 'text-expander-change')
@@ -97,7 +97,7 @@ describe('text-expander element', function() {
       assert.equal('match', text)
     })
 
-    it('dispatches change event', async function() {
+    it('dispatches change event for multi-word with single word inside', async function() {
       const expander = document.querySelector('text-expander')
       const input = expander.querySelector('textarea')
       const result = once(expander, 'text-expander-change')
