@@ -13,6 +13,11 @@ type Result = {
   matched: boolean
 }
 
+type Key = {
+  key: string
+  multiWord: boolean
+}
+
 const states = new WeakMap()
 
 class TextExpander {
@@ -27,18 +32,18 @@ class TextExpander {
   onmousedown: (event: Event) => void
   combobox: Combobox | null
   match: Match | null
-  multiWord: boolean
   justPasted: boolean
+  lookBackIndex: number
   interactingWithList: boolean
 
-  constructor(expander: TextExpanderElement, input: HTMLInputElement | HTMLTextAreaElement, multiWord = false) {
+  constructor(expander: TextExpanderElement, input: HTMLInputElement | HTMLTextAreaElement) {
     this.expander = expander
     this.input = input
     this.combobox = null
     this.menu = null
     this.match = null
     this.justPasted = false
-    this.multiWord = multiWord
+    this.lookBackIndex = 0
     this.oninput = this.onInput.bind(this)
     this.onpaste = this.onPaste.bind(this)
     this.onkeydown = this.onKeydown.bind(this)
@@ -118,6 +123,8 @@ class TextExpander {
     const cursor = beginning.length + value.length
     this.input.selectionStart = cursor
     this.input.selectionEnd = cursor
+
+    this.lookBackIndex = cursor
   }
 
   onBlur() {
@@ -159,10 +166,13 @@ class TextExpander {
   }
 
   findMatch(): Match | void {
-    const cursor = this.input.selectionEnd
+    const cursor = this.input.selectionEnd || 0
     const text = this.input.value
-    for (const key of this.expander.keys) {
-      const found = query(text, key, cursor || 0, this.multiWord)
+    if (cursor <= this.lookBackIndex) {
+      this.lookBackIndex = 0
+    }
+    for (const {key, multiWord} of this.expander.keys) {
+      const found = query(text, key, cursor, {multiWord, lookBackIndex: this.lookBackIndex})
       if (found) {
         return {text: found.text, key, position: found.position}
       }
@@ -196,16 +206,21 @@ class TextExpander {
 }
 
 export default class TextExpanderElement extends HTMLElement {
-  get keys(): string[] {
-    const keys = this.getAttribute('keys')
-    return keys ? keys.split(' ') : []
+  get keys(): Key[] {
+    const keysAttr = this.getAttribute('keys')
+    const keys = keysAttr ? keysAttr.split(' ') : []
+
+    const multiWordAttr = this.getAttribute('multiword')
+    const multiWord = multiWordAttr ? multiWordAttr.split(' ') : []
+    const globalMultiWord = multiWord.length === 0 && this.hasAttribute('multiword')
+
+    return keys.map(key => ({key, multiWord: globalMultiWord || multiWord.includes(key)}))
   }
 
   connectedCallback() {
     const input = this.querySelector('input[type="text"], textarea')
     if (!(input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement)) return
-    const multiWord = this.hasAttribute('multiword')
-    const state = new TextExpander(this, input, multiWord)
+    const state = new TextExpander(this, input)
     states.set(this, state)
   }
 

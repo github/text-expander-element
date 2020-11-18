@@ -27,7 +27,7 @@ With a script tag:
 ### Markup
 
 ```html
-<text-expander keys=": @ #">
+<text-expander keys=": @ #" multiword="#">
   <textarea></textarea>
 </text-expander>
 ```
@@ -36,6 +36,7 @@ With a script tag:
 
 - `keys` is a space separated list of menu activation keys
 - `multiword` defines whether the expansion should use several words or not
+  - you can provide a space separated list of activation keys that should support multi-word matching
 
 ## Events
 

@@ -40,6 +40,7 @@
                 const item = document.createElement('li')
                 item.setAttribute('role', 'option')
                 item.textContent = issue
+                item.setAttribute('data-value', issue.split(' ')[0])
                 item.id = `option-${issue}`
                 menu.append(item)
               }
@@ -50,7 +51,7 @@
 
         expander.addEventListener('text-expander-value', function(event) {
           const {key, item} = event.detail
-          if (key === '#') event.detail.value = item.textContent
+          if (key === '#') event.detail.value = item.getAttribute('data-value') || item.textContent
         })
       }
     </script>

@@ -29,7 +29,13 @@ describe('text-expander element', function() {
 
     it('has activation keys', function() {
       const expander = document.querySelector('text-expander')
-      assert.deepEqual([':', '@'], expander.keys)
+      assert.deepEqual(
+        [
+          {key: ':', multiWord: false},
+          {key: '@', multiWord: false}
+        ],
+        expander.keys
+      )
     })
 
     it('dispatches change event', async function() {
@@ -40,6 +46,66 @@ describe('text-expander element', function() {
       const event = await result
       const {key} = event.detail
       assert.equal(':', key)
+    })
+  })
+
+  describe('multi-word scenarios', function() {
+    beforeEach(function() {
+      const container = document.createElement('div')
+      container.innerHTML = `
+        <text-expander keys="@ #" multiword="#">
+          <textarea></textarea>
+        </text-expander>
+      `
+      document.body.append(container)
+    })
+
+    afterEach(function() {
+      document.body.innerHTML = ''
+    })
+
+    it('has activation keys', function() {
+      const expander = document.querySelector('text-expander')
+      assert.deepEqual(
+        [
+          {key: '@', multiWord: false},
+          {key: '#', multiWord: true}
+        ],
+        expander.keys
+      )
+    })
+
+    it('dispatches change event for multi-word', async function() {
+      const expander = document.querySelector('text-expander')
+      const input = expander.querySelector('textarea')
+      const result = once(expander, 'text-expander-change')
+      triggerInput(input, '@match #some text')
+      const event = await result
+      const {key, text} = event.detail
+      assert.equal('#', key)
+      assert.equal('some text', text)
+    })
+
+    it('dispatches change event for single word match after multi-word', async function() {
+      const expander = document.querySelector('text-expander')
+      const input = expander.querySelector('textarea')
+      const result = once(expander, 'text-expander-change')
+      triggerInput(input, '#some text @match')
+      const event = await result
+      const {key, text} = event.detail
+      assert.equal('@', key)
+      assert.equal('match', text)
+    })
+
+    it('dispatches change event for multi-word with single word inside', async function() {
+      const expander = document.querySelector('text-expander')
+      const input = expander.querySelector('textarea')
+      const result = once(expander, 'text-expander-change')
+      triggerInput(input, '#some text @match word')
+      const event = await result
+      const {key, text} = event.detail
+      assert.equal('#', key)
+      assert.equal('some text @match word', text)
     })
   })
 })
