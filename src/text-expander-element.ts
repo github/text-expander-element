@@ -90,6 +90,7 @@ class TextExpander {
     const menu = this.menu
     if (!menu || !this.combobox) return
     this.menu = null
+    this.combobox = null
 
     menu.removeEventListener('combobox-commit', this.oncommit)
     menu.removeEventListener('mousedown', this.onmousedown)
