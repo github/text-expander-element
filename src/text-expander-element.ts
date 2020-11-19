@@ -94,6 +94,7 @@ class TextExpander {
     menu.removeEventListener('combobox-commit', this.oncommit)
     menu.removeEventListener('mousedown', this.onmousedown)
     this.combobox.destroy()
+    this.combobox = null
     menu.remove()
   }
 
