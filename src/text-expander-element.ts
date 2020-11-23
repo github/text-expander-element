@@ -50,6 +50,7 @@ class TextExpander {
     this.oncommit = this.onCommit.bind(this)
     this.onmousedown = this.onMousedown.bind(this)
     this.onblur = this.onBlur.bind(this)
+    this.onDismiss = this.onDismiss.bind(this)
     this.interactingWithList = false
     input.addEventListener('paste', this.onpaste)
     input.addEventListener('input', this.oninput)
@@ -67,7 +68,7 @@ class TextExpander {
   activate(match: Match, menu: HTMLElement) {
     if (this.input !== document.activeElement) return
 
-    this.deactivate()
+    this.deactivate(0)
     this.menu = menu
 
     if (!menu.id) menu.id = `text-expander-${Math.floor(Math.random() * 100000).toString()}`
@@ -81,21 +82,30 @@ class TextExpander {
     this.combobox.start()
     menu.addEventListener('combobox-commit', this.oncommit)
     menu.addEventListener('mousedown', this.onmousedown)
+    this.expander.addEventListener('text-expander-dismiss', this.onDismiss)
 
     // Focus first menu item.
     this.combobox.navigate(1)
   }
 
-  deactivate() {
+  deactivate(cursor: number) {
     const menu = this.menu
     if (!menu || !this.combobox) return
     this.menu = null
 
     menu.removeEventListener('combobox-commit', this.oncommit)
     menu.removeEventListener('mousedown', this.onmousedown)
+    this.expander.removeEventListener('text-expander-dismiss', this.onDismiss)
+
     this.combobox.destroy()
     this.combobox = null
     menu.remove()
+
+    this.lookBackIndex = cursor
+  }
+
+  onDismiss() {
+    this.deactivate(this.input.selectionEnd || this.lookBackIndex)
   }
 
   onCommit({target}: Event) {
@@ -118,13 +128,13 @@ class TextExpander {
 
     this.input.value = beginning + value + remaining
 
-    this.deactivate()
+    const cursor = beginning.length + value.length
+
+    this.deactivate(cursor)
     this.input.focus()
 
-    const cursor = beginning.length + value.length
     this.input.selectionStart = cursor
     this.input.selectionEnd = cursor
-
     this.lookBackIndex = cursor
   }
 
@@ -134,7 +144,7 @@ class TextExpander {
       return
     }
 
-    this.deactivate()
+    this.deactivate(this.lookBackIndex)
   }
 
   onPaste() {
@@ -158,11 +168,11 @@ class TextExpander {
       if (menu) {
         this.activate(match, menu)
       } else {
-        this.deactivate()
+        this.deactivate(this.lookBackIndex)
       }
     } else {
       this.match = null
-      this.deactivate()
+      this.deactivate(this.lookBackIndex)
     }
   }
 
@@ -199,7 +209,10 @@ class TextExpander {
 
   onKeydown(event: KeyboardEvent) {
     if (event.key === 'Escape' && (this.menu || this.combobox)) {
-      this.deactivate()
+      const cancelled = this.expander.dispatchEvent(new CustomEvent('text-expander-dismiss', {cancelable: true}))
+      if (cancelled) {
+        return
+      }
       event.stopImmediatePropagation()
       event.preventDefault()
     }

@@ -49,6 +49,12 @@
           }
         })
 
+        expander.addEventListener('keydown', event => {
+          if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+            expander.dispatchEvent(new CustomEvent('text-expander-dismiss', {cancelable: true}))
+          }
+        })
+
         expander.addEventListener('text-expander-value', function(event) {
           const {key, item} = event.detail
           if (key === '#') event.detail.value = item.getAttribute('data-value') || item.textContent
