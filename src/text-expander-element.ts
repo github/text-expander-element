@@ -68,7 +68,7 @@ class TextExpander {
   activate(match: Match, menu: HTMLElement) {
     if (this.input !== document.activeElement) return
 
-    this.deactivate(0)
+    this.deactivate(this.lookBackIndex)
     this.menu = menu
 
     if (!menu.id) menu.id = `text-expander-${Math.floor(Math.random() * 100000).toString()}`
