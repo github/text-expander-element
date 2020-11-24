@@ -88,9 +88,9 @@ class TextExpander {
     this.combobox.navigate(1)
   }
 
-  deactivate(cursor: number) {
+  deactivate(cursor: number): boolean {
     const menu = this.menu
-    if (!menu || !this.combobox) return
+    if (!menu || !this.combobox) return false
     this.menu = null
 
     menu.removeEventListener('combobox-commit', this.oncommit)
@@ -102,6 +102,7 @@ class TextExpander {
     menu.remove()
 
     this.lookBackIndex = cursor
+    return true
   }
 
   onDismiss() {
@@ -208,13 +209,11 @@ class TextExpander {
   }
 
   onKeydown(event: KeyboardEvent) {
-    if (event.key === 'Escape' && (this.menu || this.combobox)) {
-      const cancelled = this.expander.dispatchEvent(new CustomEvent('text-expander-dismiss', {cancelable: true}))
-      if (cancelled) {
-        return
+    if (event.key === 'Escape') {
+      if (this.deactivate(this.input.selectionEnd || this.lookBackIndex)) {
+        event.stopImmediatePropagation()
+        event.preventDefault()
       }
-      event.stopImmediatePropagation()
-      event.preventDefault()
     }
   }
 }
