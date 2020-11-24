@@ -51,8 +51,7 @@ describe('text-expander element', function() {
     it('Escape triggers text-expander-dismiss', async function() {
       const expander = document.querySelector('text-expander')
       const input = expander.querySelector('textarea')
-
-      const menu =  document.createElement('ul');
+      const menu = document.createElement('ul')
       menu.appendChild(document.createElement('li'))
 
       expander.addEventListener('text-expander-change', event => {
@@ -61,13 +60,13 @@ describe('text-expander element', function() {
       })
 
       input.focus()
-      // This is dependent on the implementation detail or text-expander-element
-      // and it needs to wait for all the Promises there to fullfil
+      // This is dependent on the implementation detail of text-expander-element
+      // and it needs to await for all the Promises there to fullfil
       await await await triggerInput(input, ':')
 
       const resultDismiss = once(expander, 'text-expander-dismiss')
       input.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape'}))
-      const eventDismiss= await resultDismiss
+      const eventDismiss = await resultDismiss
       assert.equal(eventDismiss.type, 'text-expander-dismiss')
     })
   })
