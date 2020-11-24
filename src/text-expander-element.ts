@@ -32,6 +32,7 @@ class TextExpander {
   onmousedown: (event: Event) => void
   combobox: Combobox | null
   match: Match | null
+  matchInProgress: boolean
   justPasted: boolean
   lookBackIndex: number
   interactingWithList: boolean
@@ -42,6 +43,7 @@ class TextExpander {
     this.combobox = null
     this.menu = null
     this.match = null
+    this.matchInProgress = false
     this.justPasted = false
     this.lookBackIndex = 0
     this.oninput = this.onInput.bind(this)
@@ -68,6 +70,7 @@ class TextExpander {
     if (this.input !== document.activeElement) return
 
     this.deactivate()
+    this.matchInProgress = true
     this.menu = menu
 
     if (!menu.id) menu.id = `text-expander-${Math.floor(Math.random() * 100000).toString()}`
@@ -96,6 +99,7 @@ class TextExpander {
     this.combobox.destroy()
     this.combobox = null
     menu.remove()
+    this.matchInProgress = false
   }
 
   onCommit({target}: Event) {
@@ -173,7 +177,11 @@ class TextExpander {
       this.lookBackIndex = 0
     }
     for (const {key, multiWord} of this.expander.keys) {
-      const found = query(text, key, cursor, {multiWord, lookBackIndex: this.lookBackIndex})
+      const found = query(text, key, cursor, {
+        multiWord,
+        lookBackIndex: this.lookBackIndex,
+        matchInProgress: this.matchInProgress
+      })
       if (found) {
         return {text: found.text, key, position: found.position}
       }

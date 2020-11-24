@@ -6,6 +6,7 @@ type Query = {
 type QueryOptions = {
   lookBackIndex: number
   multiWord: boolean
+  matchInProgress: boolean
 }
 
 const boundary = /\s|\(|\[/
@@ -15,13 +16,21 @@ export default function query(
   text: string,
   key: string,
   cursor: number,
-  {multiWord, lookBackIndex}: QueryOptions = {multiWord: false, lookBackIndex: 0}
+  {multiWord, lookBackIndex, matchInProgress}: QueryOptions = {
+    multiWord: false,
+    lookBackIndex: 0,
+    matchInProgress: false
+  }
 ): Query | void {
   // Activation key not found in front of the cursor.
-  const keyIndex = text.lastIndexOf(key, cursor - 1)
+  let keyIndex = text.lastIndexOf(key, cursor - 1)
   if (keyIndex === -1) return
 
   if (multiWord) {
+    if (matchInProgress) {
+      keyIndex = lookBackIndex
+    }
+
     // Stop matching at the lookBackIndex
     if (keyIndex < lookBackIndex) return
 
