@@ -87,7 +87,7 @@ class TextExpander {
   }
 
   deactivate(cursor?: number) {
-    cursor = cursor || this.input.selectionEnd || this.lookBackIndex
+    cursor = cursor || this.lookBackIndex
     const menu = this.menu
     if (!menu || !this.combobox) return
     this.menu = null
@@ -203,10 +203,7 @@ class TextExpander {
 
   onKeydown(event: KeyboardEvent) {
     if (event.key === 'Escape' && (this.menu || this.combobox)) {
-      const cancelled = this.expander.dispatchEvent(new CustomEvent('text-expander-dismiss', {cancelable: true}))
-      if (cancelled) {
-        return
-      }
+      this.deactivate(this.input.selectionEnd || this.lookBackIndex)
       event.stopImmediatePropagation()
       event.preventDefault()
     }

@@ -21,10 +21,9 @@ export default function query(
   const keyIndex = text.lastIndexOf(key, cursor - 1)
   if (keyIndex === -1) return
 
-  if (multiWord) {
-    // Stop matching at the lookBackIndex
-    if (keyIndex < lookBackIndex) return
+  if (keyIndex < lookBackIndex) return
 
+  if (multiWord) {
     // Space immediately after activation key
     const charAfterKey = text[keyIndex + 1]
     if (charAfterKey === ' ') return
