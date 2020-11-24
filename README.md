@@ -90,6 +90,13 @@ expander.addEventListener('text-expander-value', function(event) {
 })
 ```
 
+**`text-expander-dismiss`** is an event the text-expander-element is listening to. The event can be fired in order to hide the menu provided through `provide` method. It is not expecting any parameter. It is used internally to hide the menu when Escape key it hit.
+
+```js
+const expander = document.querySelector('text-expander')
+expander.dispatchEvent('text-expander-dismiss')
+
+```
 ## Browser support
 
 Browsers without native [custom element support][support] require a [polyfill][].
