@@ -89,7 +89,7 @@ class TextExpander {
   deactivate(cursor?: number) {
     cursor = cursor || this.lookBackIndex
     const menu = this.menu
-    if (!menu || !this.combobox) return
+    if (!menu || !this.combobox) return false
     this.menu = null
 
     menu.removeEventListener('combobox-commit', this.oncommit)
@@ -100,6 +100,7 @@ class TextExpander {
     menu.remove()
 
     this.lookBackIndex = cursor
+    return true
   }
 
   onCommit({target}: Event) {
@@ -202,14 +203,14 @@ class TextExpander {
   }
 
   onKeydown(event: KeyboardEvent) {
-    if (event.key === 'Escape' && (this.menu || this.combobox)) {
-      this.deactivate(this.input.selectionEnd || this.lookBackIndex)
-      event.stopImmediatePropagation()
-      event.preventDefault()
+    if (event.key === 'Escape') {
+      if (this.deactivate(this.input.selectionEnd || this.lookBackIndex)) {
+        event.stopImmediatePropagation()
+        event.preventDefault()
+      }
     }
   }
 }
-
 export default class TextExpanderElement extends HTMLElement {
   get keys(): Key[] {
     const keysAttr = this.getAttribute('keys')
