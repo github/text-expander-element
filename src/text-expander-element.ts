@@ -176,7 +176,7 @@ class TextExpander {
       const found = query(text, key, cursor, {
         multiWord,
         lookBackIndex: this.lookBackIndex,
-        match: this.match
+        previousMatch: this.match
       })
       if (found) {
         return {text: found.text, key, position: found.position}
