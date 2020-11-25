@@ -1,3 +1,5 @@
+import {Match} from './text-expander-element'
+
 type Query = {
   text: string
   position: number
@@ -6,8 +8,7 @@ type Query = {
 type QueryOptions = {
   lookBackIndex: number
   multiWord: boolean
-  matchInProgress: boolean
-  currentMatchIndex: number
+  match: Match | null
 }
 
 const boundary = /\s|\(|\[/
@@ -17,11 +18,10 @@ export default function query(
   text: string,
   key: string,
   cursor: number,
-  {multiWord, lookBackIndex, matchInProgress, currentMatchIndex}: QueryOptions = {
+  {multiWord, lookBackIndex, match}: QueryOptions = {
     multiWord: false,
     lookBackIndex: 0,
-    matchInProgress: false,
-    currentMatchIndex: 0
+    match: null
   }
 ): Query | void {
   // Activation key not found in front of the cursor.
@@ -29,8 +29,8 @@ export default function query(
   if (keyIndex === -1) return
 
   if (multiWord) {
-    if (matchInProgress) {
-      keyIndex = currentMatchIndex - 1
+    if (match) {
+      keyIndex = match.position - 1
     }
 
     // Stop matching at the lookBackIndex

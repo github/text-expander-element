@@ -2,7 +2,7 @@ import Combobox from '@github/combobox-nav'
 import query from './query'
 import textFieldSelectionPosition from './text-field-selection-position'
 
-type Match = {
+export type Match = {
   text: string
   key: string
   position: number
@@ -32,8 +32,6 @@ class TextExpander {
   onmousedown: (event: Event) => void
   combobox: Combobox | null
   match: Match | null
-  matchInProgress: boolean
-  currentMatchIndex: number
   justPasted: boolean
   lookBackIndex: number
   interactingWithList: boolean
@@ -44,8 +42,6 @@ class TextExpander {
     this.combobox = null
     this.menu = null
     this.match = null
-    this.matchInProgress = false
-    this.currentMatchIndex = 0
     this.justPasted = false
     this.lookBackIndex = 0
     this.oninput = this.onInput.bind(this)
@@ -72,8 +68,6 @@ class TextExpander {
     if (this.input !== document.activeElement) return
 
     this.deactivate()
-    this.matchInProgress = true
-    this.currentMatchIndex = match.position
     this.menu = menu
 
     if (!menu.id) menu.id = `text-expander-${Math.floor(Math.random() * 100000).toString()}`
@@ -102,8 +96,6 @@ class TextExpander {
     this.combobox.destroy()
     this.combobox = null
     menu.remove()
-    this.matchInProgress = false
-    this.currentMatchIndex = 0
   }
 
   onCommit({target}: Event) {
@@ -184,8 +176,7 @@ class TextExpander {
       const found = query(text, key, cursor, {
         multiWord,
         lookBackIndex: this.lookBackIndex,
-        matchInProgress: this.matchInProgress,
-        currentMatchIndex: this.currentMatchIndex
+        match: this.match
       })
       if (found) {
         return {text: found.text, key, position: found.position}
@@ -213,6 +204,7 @@ class TextExpander {
   onKeydown(event: KeyboardEvent) {
     if (event.key === 'Escape' && (this.menu || this.combobox)) {
       this.deactivate()
+      this.match = null
       event.stopImmediatePropagation()
       event.preventDefault()
     }
