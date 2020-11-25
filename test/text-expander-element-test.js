@@ -47,6 +47,27 @@ describe('text-expander element', function() {
       const {key} = event.detail
       assert.equal(':', key)
     })
+
+    it('dismisses the menu when dismiss() is called', async function() {
+      const expander = document.querySelector('text-expander')
+      const input = expander.querySelector('textarea')
+      const menu = document.createElement('ul')
+      menu.appendChild(document.createElement('li'))
+
+      expander.addEventListener('text-expander-change', event => {
+        const {provide} = event.detail
+        provide(Promise.resolve({matched: true, fragment: menu}))
+      })
+
+      input.focus()
+      triggerInput(input, ':')
+      await waitForAnimationFrame()
+      assert.exists(expander.querySelector('ul'))
+
+      expander.dismiss()
+      await waitForAnimationFrame()
+      assert.isNull(expander.querySelector('ul'))
+    })
   })
 
   describe('multi-word scenarios', function() {
@@ -119,4 +140,10 @@ function once(element, eventName) {
 function triggerInput(input, value) {
   input.value = value
   return input.dispatchEvent(new InputEvent('input'))
+}
+
+async function waitForAnimationFrame() {
+  return new Promise(resolve => {
+    window.requestAnimationFrame(resolve)
+  })
 }

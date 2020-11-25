@@ -64,7 +64,13 @@ class TextExpander {
     this.input.removeEventListener('blur', this.onblur)
   }
 
-  activate(match: Match, menu: HTMLElement) {
+  dismissMenu() {
+    if (this.deactivate()) {
+      this.lookBackIndex = this.input.selectionEnd || this.lookBackIndex
+    }
+  }
+
+  private activate(match: Match, menu: HTMLElement) {
     if (this.input !== document.activeElement) return
 
     this.deactivate()
@@ -86,19 +92,22 @@ class TextExpander {
     this.combobox.navigate(1)
   }
 
-  deactivate() {
+  private deactivate() {
     const menu = this.menu
-    if (!menu || !this.combobox) return
+    if (!menu || !this.combobox) return false
     this.menu = null
 
     menu.removeEventListener('combobox-commit', this.oncommit)
     menu.removeEventListener('mousedown', this.onmousedown)
+
     this.combobox.destroy()
     this.combobox = null
     menu.remove()
+
+    return true
   }
 
-  onCommit({target}: Event) {
+  private onCommit({target}: Event) {
     const item = target
     if (!(item instanceof HTMLElement)) return
     if (!this.combobox) return
@@ -118,17 +127,17 @@ class TextExpander {
 
     this.input.value = beginning + value + remaining
 
+    const cursor = beginning.length + value.length
+
     this.deactivate()
     this.input.focus()
 
-    const cursor = beginning.length + value.length
     this.input.selectionStart = cursor
     this.input.selectionEnd = cursor
-
     this.lookBackIndex = cursor
   }
 
-  onBlur() {
+  private onBlur() {
     if (this.interactingWithList) {
       this.interactingWithList = false
       return
@@ -137,7 +146,7 @@ class TextExpander {
     this.deactivate()
   }
 
-  onPaste() {
+  private onPaste() {
     this.justPasted = true
   }
 
@@ -193,19 +202,20 @@ class TextExpander {
     return fragments[0]
   }
 
-  onMousedown() {
+  private onMousedown() {
     this.interactingWithList = true
   }
 
-  onKeydown(event: KeyboardEvent) {
-    if (event.key === 'Escape' && (this.menu || this.combobox)) {
-      this.deactivate()
-      event.stopImmediatePropagation()
-      event.preventDefault()
+  private onKeydown(event: KeyboardEvent) {
+    if (event.key === 'Escape') {
+      if (this.deactivate()) {
+        this.lookBackIndex = this.input.selectionEnd || this.lookBackIndex
+        event.stopImmediatePropagation()
+        event.preventDefault()
+      }
     }
   }
 }
-
 export default class TextExpanderElement extends HTMLElement {
   get keys(): Key[] {
     const keysAttr = this.getAttribute('keys')
@@ -226,9 +236,15 @@ export default class TextExpanderElement extends HTMLElement {
   }
 
   disconnectedCallback() {
-    const state = states.get(this)
+    const state: TextExpander = states.get(this)
     if (!state) return
     state.destroy()
     states.delete(this)
+  }
+
+  dismiss() {
+    const state: TextExpander = states.get(this)
+    if (!state) return
+    state.dismissMenu()
   }
 }
