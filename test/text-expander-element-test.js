@@ -48,7 +48,7 @@ describe('text-expander element', function() {
       assert.equal(':', key)
     })
 
-    it('Escape dismisses the menu', async function() {
+    it('dismisses the menu when dismiss() is called', async function() {
       const expander = document.querySelector('text-expander')
       const input = expander.querySelector('textarea')
       const menu = document.createElement('ul')
