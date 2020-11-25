@@ -64,7 +64,13 @@ class TextExpander {
     this.input.removeEventListener('blur', this.onblur)
   }
 
-  activate(match: Match, menu: HTMLElement) {
+  dismissMenu() {
+    if (this.deactivate()) {
+      this.lookBackIndex = this.input.selectionEnd || this.lookBackIndex
+    }
+  }
+
+  private activate(match: Match, menu: HTMLElement) {
     if (this.input !== document.activeElement) return
 
     this.deactivate()
@@ -86,7 +92,7 @@ class TextExpander {
     this.combobox.navigate(1)
   }
 
-  deactivate() {
+  private deactivate() {
     const menu = this.menu
     if (!menu || !this.combobox) return false
     this.menu = null
@@ -101,7 +107,7 @@ class TextExpander {
     return true
   }
 
-  onCommit({target}: Event) {
+  private onCommit({target}: Event) {
     const item = target
     if (!(item instanceof HTMLElement)) return
     if (!this.combobox) return
@@ -131,7 +137,7 @@ class TextExpander {
     this.lookBackIndex = cursor
   }
 
-  onBlur() {
+  private onBlur() {
     if (this.interactingWithList) {
       this.interactingWithList = false
       return
@@ -140,7 +146,7 @@ class TextExpander {
     this.deactivate()
   }
 
-  onPaste() {
+  private onPaste() {
     this.justPasted = true
   }
 
@@ -196,11 +202,11 @@ class TextExpander {
     return fragments[0]
   }
 
-  onMousedown() {
+  private onMousedown() {
     this.interactingWithList = true
   }
 
-  onKeydown(event: KeyboardEvent) {
+  private onKeydown(event: KeyboardEvent) {
     if (event.key === 'Escape') {
       if (this.deactivate()) {
         this.lookBackIndex = this.input.selectionEnd || this.lookBackIndex
@@ -230,15 +236,15 @@ export default class TextExpanderElement extends HTMLElement {
   }
 
   disconnectedCallback() {
-    const state = states.get(this)
+    const state: TextExpander = states.get(this)
     if (!state) return
     state.destroy()
     states.delete(this)
   }
 
   dismiss() {
-    const state = states.get(this)
+    const state: TextExpander = states.get(this)
     if (!state) return
-    state.deactivate()
+    state.dismissMenu()
   }
 }
