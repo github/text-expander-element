@@ -122,6 +122,11 @@ describe('text-expander multi word parsing', function() {
     const found = query('hi : cat bye', ':', 7, {multiWord: true})
     assert(found == null)
   })
+
+  it('matches if cursor is immediately after the key', function() {
+    const found = query('hi : cat bye', ':', 4, {multiWord: true})
+    assert.deepEqual(found, {text: '', position: 4})
+  })
 })
 
 describe('text-expander limits the lookBack after commit', function() {

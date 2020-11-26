@@ -25,9 +25,11 @@ export default function query(
   if (keyIndex < lookBackIndex) return
 
   if (multiWord) {
-    // Space immediately after activation key
-    const charAfterKey = text[keyIndex + 1]
-    if (charAfterKey === ' ') return
+    // Space immediately after activation key, but not cursor
+    const nextIndex = keyIndex + 1
+    const cursorAfterKey = nextIndex === cursor
+    const spaceAfterKey = text[nextIndex] === ' '
+    if (!cursorAfterKey && spaceAfterKey) return
 
     // New line the cursor and previous activation key.
     const newLineIndex = text.lastIndexOf('\n', cursor - 1)
