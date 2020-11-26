@@ -55,6 +55,11 @@ describe('text-expander single word parsing', function() {
     const found = query('hi :cat bye', ':', 11)
     assert(found == null)
   })
+
+  it('matches if cursor is immediately after activation key', function() {
+    const found = query('hi : cat bye', ':', 4)
+    assert.deepEqual(found, {text: '', position: 4})
+  })
 })
 
 describe('text-expander multi word parsing', function() {
@@ -123,7 +128,7 @@ describe('text-expander multi word parsing', function() {
     assert(found == null)
   })
 
-  it('matches if cursor is immediately after the key', function() {
+  it('matches if cursor is immediately after activation key', function() {
     const found = query('hi : cat bye', ':', 4, {multiWord: true})
     assert.deepEqual(found, {text: '', position: 4})
   })
