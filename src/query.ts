@@ -36,9 +36,9 @@ export default function query(
       keyIndex = previousMatch.position - 1
     }
 
-    // Space immediately after activation key
+    // Space immediately after activation key followed by the cursor
     const charAfterKey = text[keyIndex + 1]
-    if (charAfterKey === ' ') return
+    if (charAfterKey === ' ' && cursor === keyIndex + 2) return
 
     // New line the cursor and previous activation key.
     const newLineIndex = text.lastIndexOf('\n', cursor - 1)

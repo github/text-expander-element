@@ -135,6 +135,7 @@ class TextExpander {
     this.input.selectionStart = cursor
     this.input.selectionEnd = cursor
     this.lookBackIndex = cursor
+    this.match = null
   }
 
   private onBlur() {
@@ -179,7 +180,7 @@ class TextExpander {
     const cursor = this.input.selectionEnd || 0
     const text = this.input.value
     if (cursor <= this.lookBackIndex) {
-      this.lookBackIndex = 0
+      this.lookBackIndex = cursor - 1
     }
     for (const {key, multiWord} of this.expander.keys) {
       const found = query(text, key, cursor, {
@@ -212,8 +213,8 @@ class TextExpander {
 
   private onKeydown(event: KeyboardEvent) {
     if (event.key === 'Escape') {
+      this.match = null
       if (this.deactivate()) {
-        this.match = null
         this.lookBackIndex = this.input.selectionEnd || this.lookBackIndex
         event.stopImmediatePropagation()
         event.preventDefault()
