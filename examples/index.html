@@ -19,7 +19,7 @@
     </text-expander>
 
     <h2>Multiword text-expander element</h2>
-    <text-expander keys="#" multiword>
+    <text-expander keys="#" multiword="#">
       <textarea autofocus rows="10" cols="40"></textarea>
     </text-expander>
 
@@ -34,7 +34,9 @@
             for (const issue of [
               '#1 Implement a text-expander element',
               '#2 Implement multi word option',
-              '#3 Fix tpoy'
+              '#3 Fix tpoy',
+              '#4 Implement #12',
+              '#5 Implement #123 and #456',
             ]) {
               if (issue.toLowerCase().includes(text.toLowerCase())) {
                 const item = document.createElement('li')
