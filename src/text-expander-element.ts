@@ -2,7 +2,7 @@ import Combobox from '@github/combobox-nav'
 import query from './query'
 import textFieldSelectionPosition from './text-field-selection-position'
 
-export type Match = {
+type Match = {
   text: string
   key: string
   position: number
@@ -186,7 +186,7 @@ class TextExpander {
       const found = query(text, key, cursor, {
         multiWord,
         lookBackIndex: this.lookBackIndex,
-        previousMatch: this.match
+        lastMatchPosition: this.match ? this.match.position : null
       })
       if (found) {
         return {text: found.text, key, position: found.position}

@@ -1,5 +1,3 @@
-import {Match} from './text-expander-element'
-
 type Query = {
   text: string
   position: number
@@ -8,7 +6,7 @@ type Query = {
 type QueryOptions = {
   lookBackIndex: number
   multiWord: boolean
-  previousMatch: Match | null
+  lastMatchPosition: number | null
 }
 
 const boundary = /\s|\(|\[/
@@ -18,10 +16,10 @@ export default function query(
   text: string,
   key: string,
   cursor: number,
-  {multiWord, lookBackIndex, previousMatch}: QueryOptions = {
+  {multiWord, lookBackIndex, lastMatchPosition}: QueryOptions = {
     multiWord: false,
     lookBackIndex: 0,
-    previousMatch: null
+    lastMatchPosition: null
   }
 ): Query | void {
   // Activation key not found in front of the cursor.
@@ -32,13 +30,13 @@ export default function query(
   if (keyIndex < lookBackIndex) return
 
   if (multiWord) {
-    if (previousMatch) {
-      keyIndex = previousMatch.position - 1
+    if (lastMatchPosition !== null) {
+      keyIndex = lastMatchPosition - 1
     }
 
     // Space immediately after activation key followed by the cursor
     const charAfterKey = text[keyIndex + 1]
-    if (charAfterKey === ' ' && cursor === keyIndex + 2) return
+    if (charAfterKey === ' ' && cursor >= keyIndex + 2) return
 
     // New line the cursor and previous activation key.
     const newLineIndex = text.lastIndexOf('\n', cursor - 1)
