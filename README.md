@@ -44,6 +44,7 @@ With a script tag:
 
 - `key`: The matched key; for example: `:`.
 - `text`: The matched text; for example: `cat`, for `:cat`.
+  - If the `key` is specified in the `multiword` attribute then the matched text can contain multiple words; for example `cat and dog` for `:cat and dog`.
 - `provide`: A function to be called when you have the menu results. Takes a `Promise` with `{matched: boolean, fragment: HTMLElement}` where `matched` tells the element whether a suggestion is available, and `fragment` is the menu content to be displayed on the page.
 
 ```js

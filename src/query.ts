@@ -6,6 +6,7 @@ type Query = {
 type QueryOptions = {
   lookBackIndex: number
   multiWord: boolean
+  lastMatchPosition: number | null
 }
 
 const boundary = /\s|\(|\[/
@@ -15,19 +16,30 @@ export default function query(
   text: string,
   key: string,
   cursor: number,
-  {multiWord, lookBackIndex}: QueryOptions = {multiWord: false, lookBackIndex: 0}
+  {multiWord, lookBackIndex, lastMatchPosition}: QueryOptions = {
+    multiWord: false,
+    lookBackIndex: 0,
+    lastMatchPosition: null
+  }
 ): Query | void {
   // Activation key not found in front of the cursor.
-  const keyIndex = text.lastIndexOf(key, cursor - 1)
+  let keyIndex = text.lastIndexOf(key, cursor - 1)
   if (keyIndex === -1) return
 
   // Stop matching at the lookBackIndex
   if (keyIndex < lookBackIndex) return
 
   if (multiWord) {
-    // Space immediately after activation key
+    if (lastMatchPosition != null) {
+      // If the current activation key is the same as last match
+      // i.e. consecutive activation keys, then return.
+      if (lastMatchPosition === keyIndex) return
+      keyIndex = lastMatchPosition - 1
+    }
+
+    // Space immediately after activation key followed by the cursor
     const charAfterKey = text[keyIndex + 1]
-    if (charAfterKey === ' ') return
+    if (charAfterKey === ' ' && cursor >= keyIndex + 2) return
 
     // New line the cursor and previous activation key.
     const newLineIndex = text.lastIndexOf('\n', cursor - 1)

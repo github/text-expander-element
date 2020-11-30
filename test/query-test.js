@@ -124,6 +124,39 @@ describe('text-expander multi word parsing', function() {
   })
 })
 
+describe('text-expander multi word parsing with multiple activation keys', function() {
+  it('does not match consecutive activation keys', function() {
+    let found = query('::', ':', 2, {multiWord: true})
+    assert(found == null)
+
+    found = query('::', ':', 3, {multiWord: true})
+    assert(found == null)
+
+    found = query('hi :: there', ':', 5, {multiWord: true})
+    assert(found == null)
+
+    found = query('hi ::: there', ':', 6, {multiWord: true})
+    assert(found == null)
+
+    found = query('hi ::', ':', 5, {multiWord: true})
+    assert(found == null)
+
+    found = query('hi :::', ':', 6, {multiWord: true})
+    assert(found == null)
+  })
+
+  it('uses lastMatchPosition to match', function() {
+    let found = query('hi :cat :bye', ':', 12, {multiWord: true, lastMatchPosition: 4})
+    assert.deepEqual(found, {text: 'cat :bye', position: 4})
+
+    found = query('hi :cat :bye :::', ':', 16, {multiWord: true, lastMatchPosition: 4})
+    assert.deepEqual(found, {text: 'cat :bye :::', position: 4})
+
+    found = query(':hi :cat :bye :::', ':', 17, {multiWord: true, lastMatchPosition: 1})
+    assert.deepEqual(found, {text: 'hi :cat :bye :::', position: 1})
+  })
+})
+
 describe('text-expander limits the lookBack after commit', function() {
   it('does not match if lookBackIndex is bigger than activation key index', function() {
     const found = query('hi :cat bye', ':', 11, {multiWord: true, lookBackIndex: 7})
