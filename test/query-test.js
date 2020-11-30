@@ -122,6 +122,26 @@ describe('text-expander multi word parsing', function() {
     const found = query('hi : cat bye', ':', 7, {multiWord: true})
     assert(found == null)
   })
+
+  it('does not match consecutive activation keys', function() {
+    let found = query('::', ':', 2, {multiWord: true})
+    assert(found == null)
+
+    found = query('::', ':', 3, {multiWord: true})
+    assert(found == null)
+
+    found = query('hi :: there', ':', 5, {multiWord: true})
+    assert(found == null)
+
+    found = query('hi ::: there', ':', 6, {multiWord: true})
+    assert(found == null)
+
+    found = query('hi ::', ':', 5, {multiWord: true})
+    assert(found == null)
+
+    found = query('hi :::', ':', 6, {multiWord: true})
+    assert(found == null)
+  })
 })
 
 describe('text-expander limits the lookBack after commit', function() {
