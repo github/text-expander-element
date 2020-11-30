@@ -128,6 +128,36 @@ describe('text-expander element', function() {
       assert.equal('#', key)
       assert.equal('some text @match word', text)
     })
+
+    it('dispatches change event for the first activation key even if it is typed again', async function() {
+      const expander = document.querySelector('text-expander')
+      const input = expander.querySelector('textarea')
+
+      let result = once(expander, 'text-expander-change')
+      triggerInput(input, '#step 1')
+      let event = await result
+      let {key, text} = event.detail
+      assert.equal('#', key)
+      assert.equal('step 1', text)
+
+      await waitForAnimationFrame()
+
+      result = once(expander, 'text-expander-change')
+      triggerInput(input, ' #step 2', true) //<-- At this point the text inside the input field is "#step 1 #step 2"
+      event = await result
+      ;({key, text} = event.detail)
+      assert.equal('#', key)
+      assert.equal('step 1 #step 2', text)
+
+      await waitForAnimationFrame()
+
+      result = once(expander, 'text-expander-change')
+      triggerInput(input, ' #step 3', true) //<-- At this point the text inside the input field is "#step 1 #step 2 #step 3"
+      event = await result
+      ;({key, text} = event.detail)
+      assert.equal('#', key)
+      assert.equal('step 1 #step 2 #step 3', text)
+    })
   })
 })
 
@@ -137,8 +167,8 @@ function once(element, eventName) {
   })
 }
 
-function triggerInput(input, value) {
-  input.value = value
+function triggerInput(input, value, onlyAppend = false) {
+  input.value = onlyAppend ? input.value + value : value
   return input.dispatchEvent(new InputEvent('input'))
 }
 
