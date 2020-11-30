@@ -122,7 +122,9 @@ describe('text-expander multi word parsing', function() {
     const found = query('hi : cat bye', ':', 7, {multiWord: true})
     assert(found == null)
   })
+})
 
+describe('text-expander multi word parsing with multiple activation keys', function() {
   it('does not match consecutive activation keys', function() {
     let found = query('::', ':', 2, {multiWord: true})
     assert(found == null)
@@ -141,6 +143,17 @@ describe('text-expander multi word parsing', function() {
 
     found = query('hi :::', ':', 6, {multiWord: true})
     assert(found == null)
+  })
+
+  it('uses lastMatchPosition to match', function() {
+    let found = query('hi :cat :bye', ':', 12, {multiWord: true, lastMatchPosition: 4})
+    assert.deepEqual(found, {text: 'cat :bye', position: 4})
+
+    found = query('hi :cat :bye :::', ':', 16, {multiWord: true, lastMatchPosition: 4})
+    assert.deepEqual(found, {text: 'cat :bye :::', position: 4})
+
+    found = query(':hi :cat :bye :::', ':', 17, {multiWord: true, lastMatchPosition: 1})
+    assert.deepEqual(found, {text: 'hi :cat :bye :::', position: 1})
   })
 })
 
