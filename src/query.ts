@@ -30,7 +30,7 @@ export default function query(
   if (keyIndex < lookBackIndex) return
 
   if (multiWord) {
-    if (lastMatchPosition !== null) {
+    if (lastMatchPosition != null) {
       // If the current activation key is the same as last match
       // i.e. consecutive activation keys, then return.
       if (lastMatchPosition === keyIndex) return
