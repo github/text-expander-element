@@ -74,15 +74,13 @@ describe('text-expander element', function() {
       const expander = document.querySelector('text-expander')
       const input = expander.querySelector('textarea')
 
-      let calls = 0
-      const receivedText = {}
+      const receivedText = []
       const expectedText = ['', 'a', 'ab', 'abc', 'abcd']
 
       expander.addEventListener('text-expander-change', event => {
-        calls = calls + 1
         const {key, text} = event.detail
         assert.equal('[[', key)
-        receivedText[text] = true
+        receivedText.push(text)
       })
       triggerInput(input, '[[')
       triggerInput(input, '[[a')
@@ -90,10 +88,7 @@ describe('text-expander element', function() {
       triggerInput(input, '[[abc')
       triggerInput(input, '[[abcd')
 
-      for (const text of expectedText) {
-        assert(receivedText[text], 'expected `${text}`')
-      }
-      assert.equal(5, calls)
+      assert.deepEqual(receivedText, expectedText)
     })
   })
 
@@ -139,15 +134,13 @@ describe('text-expander element', function() {
       const expander = document.querySelector('text-expander')
       const input = expander.querySelector('textarea')
 
-      let calls = 0
-      const receivedText = {}
+      const receivedText = []
       const expectedText = ['', 'a', 'ab', 'abc', 'abcd', 'abcd def']
 
       expander.addEventListener('text-expander-change', event => {
-        calls = calls + 1
         const {key, text} = event.detail
         assert.equal('[[', key)
-        receivedText[text] = true
+        receivedText.push(text)
       })
       triggerInput(input, '[[')
       triggerInput(input, '[[a')
@@ -156,10 +149,7 @@ describe('text-expander element', function() {
       triggerInput(input, '[[abcd')
       triggerInput(input, '[[abcd def')
 
-      for (const text of expectedText) {
-        assert(receivedText[text], 'expected: `${text}`')
-      }
-      assert.equal(6, calls)
+      assert.deepEqual(receivedText, expectedText)
     })
 
     it('dispatches change event for single word match after multi-word', async function() {
