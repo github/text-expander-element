@@ -234,21 +234,21 @@ export default class TextExpanderElement extends HTMLElement {
     return keys.map(key => ({key, multiWord: globalMultiWord || multiWord.includes(key)}))
   }
 
-  connectedCallback() {
+  connectedCallback(): void {
     const input = this.querySelector('input[type="text"], textarea')
     if (!(input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement)) return
     const state = new TextExpander(this, input)
     states.set(this, state)
   }
 
-  disconnectedCallback() {
+  disconnectedCallback(): void {
     const state: TextExpander = states.get(this)
     if (!state) return
     state.destroy()
     states.delete(this)
   }
 
-  dismiss() {
+  dismiss(): void {
     const state: TextExpander = states.get(this)
     if (!state) return
     state.dismissMenu()

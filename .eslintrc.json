@@ -1,11 +1,9 @@
 {
-  "extends": [
-    "plugin:github/browser",
-    "plugin:github/es6",
-    "plugin:github/typescript"
-  ],
+  "root": true,
+  "plugins": ["github"],
+  "extends": ["plugin:github/browser", "plugin:github/recommended", "plugin:github/typescript"],
   "globals": {
-    "TextExpanderElement": "readable"
+    "TextExpanderElement": "readonly"
   },
   "rules": {
     "no-invalid-this": "off"

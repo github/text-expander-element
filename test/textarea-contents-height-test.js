@@ -18,17 +18,17 @@ function textareaContentsHeight(textarea) {
   return height
 }
 
-describe('textareaContentsHeight', function() {
+describe('textareaContentsHeight', function () {
   let field
 
-  beforeEach(function() {
+  beforeEach(function () {
     document.body.innerHTML = `
       <textarea style="height: 40px; width: 395px;"></textarea>
     `
     field = document.querySelector('textarea')
   })
 
-  afterEach(function() {
+  afterEach(function () {
     document.body.innerHTML = ''
   })
 
@@ -38,17 +38,17 @@ Lorem ipsum dolor sit amet, id vel assum aeterno fierent. Ad ipsum expetendis vi
 Duo id facer facete nonumes, vim no accusata dissentiet. Cum paulo delectus platonem no. Mea in latine virtute theophrastus, te minim blandit per. Vel idque homero in, vix scripta pertinax ea, eu ius delenit commune pertinacia. Noluisse voluptua invidunt ea his, id has graece maiestatis complectitur, vix cetero officiis apeirian te. Ut velit epicurei duo, vel possim aeterno convenire ei.
 `
 
-  it('height of empty textarea', function() {
+  it('height of empty textarea', function () {
     assert.equal(0, textareaContentsHeight(field))
   })
 
-  it('height of single line textarea', function() {
+  it('height of single line textarea', function () {
     field.value = 'Hello, World!'
     const height = textareaContentsHeight(field)
     assert.ok(13 <= height && height <= 21, height)
   })
 
-  it('height of multiline textarea', function() {
+  it('height of multiline textarea', function () {
     field.value = slipsum
     const height = textareaContentsHeight(field)
     assert.ok(150 <= height && height <= 400, height)

@@ -10,7 +10,7 @@
   "scripts": {
     "clean": "rm -rf dist build",
     "compile": "tsc",
-    "lint": "github-lint",
+    "lint": "eslint .",
     "prebuild": "npm run clean && npm run lint && npm run compile",
     "build": "rollup -c",
     "pretest": "npm run build && rollup -c rollup.config.test.js",
@@ -33,18 +33,18 @@
   },
   "devDependencies": {
     "@github/prettier-config": "0.0.4",
-    "chai": "^4.2.0",
-    "eslint": "^6.6.0",
-    "eslint-plugin-github": "^3.4.1",
-    "karma": "^5.0.2",
+    "chai": "^4.3.4",
+    "eslint": "^7.24.0",
+    "eslint-plugin-github": "^4.1.3",
+    "karma": "^6.3.2",
     "karma-chai": "^0.1.0",
     "karma-chrome-launcher": "^3.1.0",
-    "karma-mocha": "^2.0.0",
+    "karma-mocha": "^2.0.1",
     "karma-mocha-reporter": "^2.2.5",
-    "mocha": "^7.1.2",
-    "rollup": "^1.26.3",
+    "mocha": "^8.3.2",
+    "rollup": "^2.45.1",
     "rollup-plugin-node-resolve": "^5.2.0",
-    "typescript": "^3.8.3"
+    "typescript": "^4.2.4"
   },
   "eslintIgnore": [
     "build/",
