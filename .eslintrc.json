@@ -1,4 +1,5 @@
 {
+  "root": true,
   "plugins": ["github"],
   "extends": ["plugin:github/browser", "plugin:github/recommended", "plugin:github/typescript"],
   "globals": {
