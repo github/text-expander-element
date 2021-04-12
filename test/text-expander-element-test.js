@@ -16,7 +16,7 @@ describe('text-expander element', function() {
     beforeEach(function() {
       const container = document.createElement('div')
       container.innerHTML = `
-        <text-expander keys=": @">
+        <text-expander keys=": @ [[">
           <textarea></textarea>
         </text-expander>
       `
@@ -32,7 +32,8 @@ describe('text-expander element', function() {
       assert.deepEqual(
         [
           {key: ':', multiWord: false},
-          {key: '@', multiWord: false}
+          {key: '@', multiWord: false},
+          {key: '[[', multiWord: false}
         ],
         expander.keys
       )
@@ -68,13 +69,34 @@ describe('text-expander element', function() {
       await waitForAnimationFrame()
       assert.isNull(expander.querySelector('ul'))
     })
+
+    it('dispatches change events for 2 char activation keys', async function() {
+      const expander = document.querySelector('text-expander')
+      const input = expander.querySelector('textarea')
+
+      const receivedText = []
+      const expectedText = ['', 'a', 'ab', 'abc', 'abcd']
+
+      expander.addEventListener('text-expander-change', event => {
+        const {key, text} = event.detail
+        assert.equal('[[', key)
+        receivedText.push(text)
+      })
+      triggerInput(input, '[[')
+      triggerInput(input, '[[a')
+      triggerInput(input, '[[ab')
+      triggerInput(input, '[[abc')
+      triggerInput(input, '[[abcd')
+
+      assert.deepEqual(receivedText, expectedText)
+    })
   })
 
   describe('multi-word scenarios', function() {
     beforeEach(function() {
       const container = document.createElement('div')
       container.innerHTML = `
-        <text-expander keys="@ #" multiword="#">
+        <text-expander keys="@ # [[" multiword="# [[">
           <textarea></textarea>
         </text-expander>
       `
@@ -90,7 +112,8 @@ describe('text-expander element', function() {
       assert.deepEqual(
         [
           {key: '@', multiWord: false},
-          {key: '#', multiWord: true}
+          {key: '#', multiWord: true},
+          {key: '[[', multiWord: true}
         ],
         expander.keys
       )
@@ -105,6 +128,28 @@ describe('text-expander element', function() {
       const {key, text} = event.detail
       assert.equal('#', key)
       assert.equal('some text', text)
+    })
+
+    it('dispatches change events for 2 char activation keys for multi-word', async function() {
+      const expander = document.querySelector('text-expander')
+      const input = expander.querySelector('textarea')
+
+      const receivedText = []
+      const expectedText = ['', 'a', 'ab', 'abc', 'abcd', 'abcd def']
+
+      expander.addEventListener('text-expander-change', event => {
+        const {key, text} = event.detail
+        assert.equal('[[', key)
+        receivedText.push(text)
+      })
+      triggerInput(input, '[[')
+      triggerInput(input, '[[a')
+      triggerInput(input, '[[ab')
+      triggerInput(input, '[[abc')
+      triggerInput(input, '[[abcd')
+      triggerInput(input, '[[abcd def')
+
+      assert.deepEqual(receivedText, expectedText)
     })
 
     it('dispatches change event for single word match after multi-word', async function() {

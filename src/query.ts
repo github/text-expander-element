@@ -34,12 +34,12 @@ export default function query(
       // If the current activation key is the same as last match
       // i.e. consecutive activation keys, then return.
       if (lastMatchPosition === keyIndex) return
-      keyIndex = lastMatchPosition - 1
+      keyIndex = lastMatchPosition - key.length
     }
 
     // Space immediately after activation key followed by the cursor
     const charAfterKey = text[keyIndex + 1]
-    if (charAfterKey === ' ' && cursor >= keyIndex + 2) return
+    if (charAfterKey === ' ' && cursor >= keyIndex + key.length + 1) return
 
     // New line the cursor and previous activation key.
     const newLineIndex = text.lastIndexOf('\n', cursor - 1)
