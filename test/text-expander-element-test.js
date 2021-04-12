@@ -1,19 +1,19 @@
-describe('text-expander element', function() {
-  describe('element creation', function() {
-    it('creates from document.createElement', function() {
+describe('text-expander element', function () {
+  describe('element creation', function () {
+    it('creates from document.createElement', function () {
       const el = document.createElement('text-expander')
       assert.equal('TEXT-EXPANDER', el.nodeName)
       assert(el instanceof window.TextExpanderElement)
     })
 
-    it('creates from constructor', function() {
+    it('creates from constructor', function () {
       const el = new window.TextExpanderElement()
       assert.equal('TEXT-EXPANDER', el.nodeName)
     })
   })
 
-  describe('after tree insertion', function() {
-    beforeEach(function() {
+  describe('after tree insertion', function () {
+    beforeEach(function () {
       const container = document.createElement('div')
       container.innerHTML = `
         <text-expander keys=": @ [[">
@@ -23,11 +23,11 @@ describe('text-expander element', function() {
       document.body.append(container)
     })
 
-    afterEach(function() {
+    afterEach(function () {
       document.body.innerHTML = ''
     })
 
-    it('has activation keys', function() {
+    it('has activation keys', function () {
       const expander = document.querySelector('text-expander')
       assert.deepEqual(
         [
@@ -39,7 +39,7 @@ describe('text-expander element', function() {
       )
     })
 
-    it('dispatches change event', async function() {
+    it('dispatches change event', async function () {
       const expander = document.querySelector('text-expander')
       const input = expander.querySelector('textarea')
       const result = once(expander, 'text-expander-change')
@@ -49,7 +49,7 @@ describe('text-expander element', function() {
       assert.equal(':', key)
     })
 
-    it('dismisses the menu when dismiss() is called', async function() {
+    it('dismisses the menu when dismiss() is called', async function () {
       const expander = document.querySelector('text-expander')
       const input = expander.querySelector('textarea')
       const menu = document.createElement('ul')
@@ -70,7 +70,7 @@ describe('text-expander element', function() {
       assert.isNull(expander.querySelector('ul'))
     })
 
-    it('dispatches change events for 2 char activation keys', async function() {
+    it('dispatches change events for 2 char activation keys', async function () {
       const expander = document.querySelector('text-expander')
       const input = expander.querySelector('textarea')
 
@@ -92,8 +92,8 @@ describe('text-expander element', function() {
     })
   })
 
-  describe('multi-word scenarios', function() {
-    beforeEach(function() {
+  describe('multi-word scenarios', function () {
+    beforeEach(function () {
       const container = document.createElement('div')
       container.innerHTML = `
         <text-expander keys="@ # [[" multiword="# [[">
@@ -103,11 +103,11 @@ describe('text-expander element', function() {
       document.body.append(container)
     })
 
-    afterEach(function() {
+    afterEach(function () {
       document.body.innerHTML = ''
     })
 
-    it('has activation keys', function() {
+    it('has activation keys', function () {
       const expander = document.querySelector('text-expander')
       assert.deepEqual(
         [
@@ -119,7 +119,7 @@ describe('text-expander element', function() {
       )
     })
 
-    it('dispatches change event for multi-word', async function() {
+    it('dispatches change event for multi-word', async function () {
       const expander = document.querySelector('text-expander')
       const input = expander.querySelector('textarea')
       const result = once(expander, 'text-expander-change')
@@ -130,7 +130,7 @@ describe('text-expander element', function() {
       assert.equal('some text', text)
     })
 
-    it('dispatches change events for 2 char activation keys for multi-word', async function() {
+    it('dispatches change events for 2 char activation keys for multi-word', async function () {
       const expander = document.querySelector('text-expander')
       const input = expander.querySelector('textarea')
 
@@ -152,7 +152,7 @@ describe('text-expander element', function() {
       assert.deepEqual(receivedText, expectedText)
     })
 
-    it('dispatches change event for single word match after multi-word', async function() {
+    it('dispatches change event for single word match after multi-word', async function () {
       const expander = document.querySelector('text-expander')
       const input = expander.querySelector('textarea')
       const result = once(expander, 'text-expander-change')
@@ -163,7 +163,7 @@ describe('text-expander element', function() {
       assert.equal('match', text)
     })
 
-    it('dispatches change event for multi-word with single word inside', async function() {
+    it('dispatches change event for multi-word with single word inside', async function () {
       const expander = document.querySelector('text-expander')
       const input = expander.querySelector('textarea')
       const result = once(expander, 'text-expander-change')
@@ -174,7 +174,7 @@ describe('text-expander element', function() {
       assert.equal('some text @match word', text)
     })
 
-    it('dispatches change event for the first activation key even if it is typed again', async function() {
+    it('dispatches change event for the first activation key even if it is typed again', async function () {
       const expander = document.querySelector('text-expander')
       const input = expander.querySelector('textarea')
 
