@@ -1,3 +1,5 @@
+import {WrapperComponent} from './WrapperComponent'
+
 describe('text-expander element', function () {
   describe('element creation', function () {
     it('creates from document.createElement', function () {
@@ -202,6 +204,31 @@ describe('text-expander element', function () {
       ;({key, text} = event.detail)
       assert.equal('#', key)
       assert.equal('step 1 #step 2 #step 3', text)
+    })
+  })
+
+  describe('use in customElement', function () {
+    this.beforeAll(function () {
+      customElements.define('wrapper-component', WrapperComponent)
+    })
+
+    beforeEach(function () {
+      const container = document.createElement('div')
+      container.innerHTML = '<wrapper-component></wrapper-component>'
+      document.body.append(container)
+    })
+
+    afterEach(function () {
+      document.body.innerHTML = ''
+    })
+
+    it('show results on input', async function () {
+      const component = document.querySelector('wrapper-component')
+      const input = component.shadowRoot.querySelector('textarea')
+      input.focus()
+      triggerInput(input, '@a')
+      await waitForAnimationFrame()
+      assert.exists(component.shadowRoot.querySelector('ul'))
     })
   })
 })
