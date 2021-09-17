@@ -71,7 +71,9 @@ class TextExpander {
   }
 
   private activate(match: Match, menu: HTMLElement) {
-    if (this.input !== document.activeElement) return
+    if (this.input !== document.activeElement && this.input !== document.activeElement?.shadowRoot?.activeElement) {
+      return
+    }
 
     this.deactivate()
     this.menu = menu
