@@ -208,7 +208,7 @@ describe('text-expander element', function () {
   })
 
   describe('use inside a ShadowDOM', function () {
-    this.beforeAll(function () {
+    before(function () {
       customElements.define('wrapper-component', WrapperComponent)
     })
 
