@@ -130,7 +130,9 @@ class TextExpander {
     const cursor = beginning.length + value.length
 
     this.deactivate()
-    this.input.focus()
+    this.input.focus({
+      preventScroll: true
+    })
 
     this.input.selectionStart = cursor
     this.input.selectionEnd = cursor
