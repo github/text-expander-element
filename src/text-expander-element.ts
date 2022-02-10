@@ -129,6 +129,8 @@ class TextExpander {
 
     this.input.value = beginning + value + remaining
 
+    this.input.dispatchEvent(new Event('change', {bubbles: true}))
+
     const cursor = beginning.length + value.length
 
     this.deactivate()
