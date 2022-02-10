@@ -51,6 +51,16 @@ describe('text-expander element', function () {
       assert.equal(':', key)
     })
 
+    it('dispatches change event with trigger change', async function () {
+      const expander = document.querySelector('text-expander')
+      const input = expander.querySelector('textarea')
+      const result = once(expander, 'text-expander-change')
+      triggerChange(input, ':')
+      const event = await result
+      const {key} = event.detail
+      assert.equal(':', key)
+    })
+
     it('dismisses the menu when dismiss() is called', async function () {
       const expander = document.querySelector('text-expander')
       const input = expander.querySelector('textarea')
@@ -64,6 +74,11 @@ describe('text-expander element', function () {
 
       input.focus()
       triggerInput(input, ':')
+      await waitForAnimationFrame()
+      assert.exists(expander.querySelector('ul'))
+
+      input.focus()
+      triggerChange(input, ':')
       await waitForAnimationFrame()
       assert.exists(expander.querySelector('ul'))
 
@@ -89,6 +104,27 @@ describe('text-expander element', function () {
       triggerInput(input, '[[ab')
       triggerInput(input, '[[abc')
       triggerInput(input, '[[abcd')
+
+      assert.deepEqual(receivedText, expectedText)
+    })
+
+    it('dispatches change events with trigger change for 2 char activation keys', async function () {
+      const expander = document.querySelector('text-expander')
+      const input = expander.querySelector('textarea')
+
+      const receivedText = []
+      const expectedText = ['', 'a', 'ab', 'abc', 'abcd']
+
+      expander.addEventListener('text-expander-change', event => {
+        const {key, text} = event.detail
+        assert.equal('[[', key)
+        receivedText.push(text)
+      })
+      triggerChange(input, '[[')
+      triggerChange(input, '[[a')
+      triggerChange(input, '[[ab')
+      triggerChange(input, '[[abc')
+      triggerChange(input, '[[abcd')
 
       assert.deepEqual(receivedText, expectedText)
     })
@@ -132,6 +168,17 @@ describe('text-expander element', function () {
       assert.equal('some text', text)
     })
 
+    it('dispatches change event with trigger change for multi-word', async function () {
+      const expander = document.querySelector('text-expander')
+      const input = expander.querySelector('textarea')
+      const result = once(expander, 'text-expander-change')
+      triggerChange(input, '@match #some text')
+      const event = await result
+      const {key, text} = event.detail
+      assert.equal('#', key)
+      assert.equal('some text', text)
+    })
+
     it('dispatches change events for 2 char activation keys for multi-word', async function () {
       const expander = document.querySelector('text-expander')
       const input = expander.querySelector('textarea')
@@ -154,6 +201,28 @@ describe('text-expander element', function () {
       assert.deepEqual(receivedText, expectedText)
     })
 
+    it('dispatches change events with trigger change for 2 char activation keys for multi-word', async function () {
+      const expander = document.querySelector('text-expander')
+      const input = expander.querySelector('textarea')
+
+      const receivedText = []
+      const expectedText = ['', 'a', 'ab', 'abc', 'abcd', 'abcd def']
+
+      expander.addEventListener('text-expander-change', event => {
+        const {key, text} = event.detail
+        assert.equal('[[', key)
+        receivedText.push(text)
+      })
+      triggerChange(input, '[[')
+      triggerChange(input, '[[a')
+      triggerChange(input, '[[ab')
+      triggerChange(input, '[[abc')
+      triggerChange(input, '[[abcd')
+      triggerChange(input, '[[abcd def')
+
+      assert.deepEqual(receivedText, expectedText)
+    })
+
     it('dispatches change event for single word match after multi-word', async function () {
       const expander = document.querySelector('text-expander')
       const input = expander.querySelector('textarea')
@@ -165,11 +234,33 @@ describe('text-expander element', function () {
       assert.equal('match', text)
     })
 
+    it('dispatches change event with trigger change for single word match after multi-word', async function () {
+      const expander = document.querySelector('text-expander')
+      const input = expander.querySelector('textarea')
+      const result = once(expander, 'text-expander-change')
+      triggerChange(input, '#some text @match')
+      const event = await result
+      const {key, text} = event.detail
+      assert.equal('@', key)
+      assert.equal('match', text)
+    })
+
     it('dispatches change event for multi-word with single word inside', async function () {
       const expander = document.querySelector('text-expander')
       const input = expander.querySelector('textarea')
       const result = once(expander, 'text-expander-change')
       triggerInput(input, '#some text @match word')
+      const event = await result
+      const {key, text} = event.detail
+      assert.equal('#', key)
+      assert.equal('some text @match word', text)
+    })
+
+    it('dispatches change event with trigger for multi-word with single word inside', async function () {
+      const expander = document.querySelector('text-expander')
+      const input = expander.querySelector('textarea')
+      const result = once(expander, 'text-expander-change')
+      triggerChange(input, '#some text @match word')
       const event = await result
       const {key, text} = event.detail
       assert.equal('#', key)
@@ -205,6 +296,36 @@ describe('text-expander element', function () {
       assert.equal('#', key)
       assert.equal('step 1 #step 2 #step 3', text)
     })
+
+    it('dispatches change event with trigger change for the first activation key even if it is typed again', async function () {
+      const expander = document.querySelector('text-expander')
+      const input = expander.querySelector('textarea')
+
+      let result = once(expander, 'text-expander-change')
+      triggerChange(input, '#step 1')
+      let event = await result
+      let {key, text} = event.detail
+      assert.equal('#', key)
+      assert.equal('step 1', text)
+
+      await waitForAnimationFrame()
+
+      result = once(expander, 'text-expander-change')
+      triggerChange(input, ' #step 2', true) //<-- At this point the text inside the input field is "#step 1 #step 2"
+      event = await result
+      ;({key, text} = event.detail)
+      assert.equal('#', key)
+      assert.equal('step 1 #step 2', text)
+
+      await waitForAnimationFrame()
+
+      result = once(expander, 'text-expander-change')
+      triggerChange(input, ' #step 3', true) //<-- At this point the text inside the input field is "#step 1 #step 2 #step 3"
+      event = await result
+      ;({key, text} = event.detail)
+      assert.equal('#', key)
+      assert.equal('step 1 #step 2 #step 3', text)
+    })
   })
 
   describe('use inside a ShadowDOM', function () {
@@ -230,6 +351,15 @@ describe('text-expander element', function () {
       await waitForAnimationFrame()
       assert.exists(component.shadowRoot.querySelector('ul'))
     })
+
+    it('show results on input with trigger change', async function () {
+      const component = document.querySelector('wrapper-component')
+      const input = component.shadowRoot.querySelector('textarea')
+      input.focus()
+      triggerChange(input, '@a')
+      await waitForAnimationFrame()
+      assert.exists(component.shadowRoot.querySelector('ul'))
+    })
   })
 })
 
@@ -242,6 +372,11 @@ function once(element, eventName) {
 function triggerInput(input, value, onlyAppend = false) {
   input.value = onlyAppend ? input.value + value : value
   return input.dispatchEvent(new InputEvent('input'))
+}
+
+function triggerChange(input, value, onlyAppend = false) {
+  input.value = onlyAppend ? input.value + value : value
+  return input.dispatchEvent(new Event('input', {bubbles: true}))
 }
 
 async function waitForAnimationFrame() {
