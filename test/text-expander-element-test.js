@@ -54,7 +54,7 @@ describe('text-expander element', function () {
     it('dispatches change event with trigger change', async function () {
       const expander = document.querySelector('text-expander')
       const input = expander.querySelector('textarea')
-      const result = once(expander, 'text-expander-change')
+      const result = once(expander, 'change')
       triggerChange(input, ':')
       const event = await result
       const {key} = event.detail
@@ -115,7 +115,7 @@ describe('text-expander element', function () {
       const receivedText = []
       const expectedText = ['', 'a', 'ab', 'abc', 'abcd']
 
-      expander.addEventListener('text-expander-change', event => {
+      expander.addEventListener('change', event => {
         const {key, text} = event.detail
         assert.equal('[[', key)
         receivedText.push(text)
@@ -171,7 +171,7 @@ describe('text-expander element', function () {
     it('dispatches change event with trigger change for multi-word', async function () {
       const expander = document.querySelector('text-expander')
       const input = expander.querySelector('textarea')
-      const result = once(expander, 'text-expander-change')
+      const result = once(expander, 'change')
       triggerChange(input, '@match #some text')
       const event = await result
       const {key, text} = event.detail
@@ -208,7 +208,7 @@ describe('text-expander element', function () {
       const receivedText = []
       const expectedText = ['', 'a', 'ab', 'abc', 'abcd', 'abcd def']
 
-      expander.addEventListener('text-expander-change', event => {
+      expander.addEventListener('change', event => {
         const {key, text} = event.detail
         assert.equal('[[', key)
         receivedText.push(text)
@@ -237,7 +237,7 @@ describe('text-expander element', function () {
     it('dispatches change event with trigger change for single word match after multi-word', async function () {
       const expander = document.querySelector('text-expander')
       const input = expander.querySelector('textarea')
-      const result = once(expander, 'text-expander-change')
+      const result = once(expander, 'change')
       triggerChange(input, '#some text @match')
       const event = await result
       const {key, text} = event.detail
@@ -259,7 +259,7 @@ describe('text-expander element', function () {
     it('dispatches change event with trigger for multi-word with single word inside', async function () {
       const expander = document.querySelector('text-expander')
       const input = expander.querySelector('textarea')
-      const result = once(expander, 'text-expander-change')
+      const result = once(expander, 'change')
       triggerChange(input, '#some text @match word')
       const event = await result
       const {key, text} = event.detail
@@ -301,7 +301,7 @@ describe('text-expander element', function () {
       const expander = document.querySelector('text-expander')
       const input = expander.querySelector('textarea')
 
-      let result = once(expander, 'text-expander-change')
+      let result = once(expander, 'change')
       triggerChange(input, '#step 1')
       let event = await result
       let {key, text} = event.detail
@@ -310,7 +310,7 @@ describe('text-expander element', function () {
 
       await waitForAnimationFrame()
 
-      result = once(expander, 'text-expander-change')
+      result = once(expander, 'change')
       triggerChange(input, ' #step 2', true) //<-- At this point the text inside the input field is "#step 1 #step 2"
       event = await result
       ;({key, text} = event.detail)
@@ -319,7 +319,7 @@ describe('text-expander element', function () {
 
       await waitForAnimationFrame()
 
-      result = once(expander, 'text-expander-change')
+      result = once(expander, 'change')
       triggerChange(input, ' #step 3', true) //<-- At this point the text inside the input field is "#step 1 #step 2 #step 3"
       event = await result
       ;({key, text} = event.detail)
@@ -376,7 +376,7 @@ function triggerInput(input, value, onlyAppend = false) {
 
 function triggerChange(input, value, onlyAppend = false) {
   input.value = onlyAppend ? input.value + value : value
-  return input.dispatchEvent(new Event('input', {bubbles: true}))
+  return input.dispatchEvent(new Event('change', {bubbles: true}))
 }
 
 async function waitForAnimationFrame() {
