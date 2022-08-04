@@ -1,6 +1,6 @@
 import query from '../dist/query'
 
-describe('text-expander single word parsing', function () {
+describe('trix-mentions single word parsing', function () {
   it('does not match empty text', function () {
     const found = query('', ':', 0)
     assert(found == null)
@@ -57,7 +57,7 @@ describe('text-expander single word parsing', function () {
   })
 })
 
-describe('text-expander multi word parsing', function () {
+describe('trix-mentions multi word parsing', function () {
   it('does not match empty text', function () {
     const found = query('', ':', 0, {multiWord: true})
     assert(found == null)
@@ -124,7 +124,7 @@ describe('text-expander multi word parsing', function () {
   })
 })
 
-describe('text-expander multi word parsing with multiple activation keys', function () {
+describe('trix-mentions multi word parsing with multiple activation keys', function () {
   it('does not match consecutive activation keys', function () {
     let found = query('::', ':', 2, {multiWord: true})
     assert(found == null)
@@ -157,7 +157,7 @@ describe('text-expander multi word parsing with multiple activation keys', funct
   })
 })
 
-describe('text-expander limits the lookBack after commit', function () {
+describe('trix-mentions limits the lookBack after commit', function () {
   it('does not match if lookBackIndex is bigger than activation key index', function () {
     const found = query('hi :cat bye', ':', 11, {multiWord: true, lookBackIndex: 7})
     assert(found == null)

@@ -3,7 +3,7 @@
   "plugins": ["github"],
   "extends": ["plugin:github/browser", "plugin:github/recommended", "plugin:github/typescript"],
   "globals": {
-    "TextExpanderElement": "readonly"
+    "TrixMentionsElement": "readonly"
   },
   "rules": {
     "no-invalid-this": "off"

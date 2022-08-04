@@ -23,9 +23,9 @@ describe('textareaContentsHeight', function () {
 
   beforeEach(function () {
     document.body.innerHTML = `
-      <textarea style="height: 40px; width: 395px;"></textarea>
+      <trix-editor style="height: 40px; width: 395px;"></trix-editor>
     `
-    field = document.querySelector('textarea')
+    field = document.querySelector('trix-editor')
   })
 
   afterEach(function () {

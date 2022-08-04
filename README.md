@@ -1,11 +1,15 @@
-# &lt;text-expander&gt; element
+# &lt;trix-mentions&gt; element
 
 Activates a suggestion menu to expand text snippets as you type.
+
+Inspired by [@github/text-expander-element][].
+
+[@github/text-expander-element]: https://github.com/github/text-expander-element
 
 ## Installation
 
 ```
-$ npm install --save @github/text-expander-element
+$ npm install --save @thoughtbot/trix-mentions-element
 ```
 
 ## Usage
@@ -15,21 +19,21 @@ $ npm install --save @github/text-expander-element
 Import as ES modules:
 
 ```js
-import '@github/text-expander-element'
+import '@thoughtbot/trix-mentions-element'
 ```
 
 With a script tag:
 
 ```html
-<script type="module" src="./node_modules/@github/text-expander-element/dist/bundle.js">
+<script type="module" src="./node_modules/@thoughtbot/trix-mentions-element/dist/bundle.js">
 ```
 
 ### Markup
 
 ```html
-<text-expander keys=": @ #" multiword="#">
-  <textarea></textarea>
-</text-expander>
+<trix-mentions keys="@ #" multiword="#">
+  <trix-editor></trix-editor>
+</trix-mentions>
 ```
 
 ## Attributes
@@ -40,19 +44,19 @@ With a script tag:
 
 ## Events
 
-**`text-expander-change`** is fired when a key is matched. In `event.detail` you can find:
+**`trix-mentions-change`** is fired when a key is matched. In `event.detail` you can find:
 
-- `key`: The matched key; for example: `:`.
-- `text`: The matched text; for example: `cat`, for `:cat`.
-  - If the `key` is specified in the `multiword` attribute then the matched text can contain multiple words; for example `cat and dog` for `:cat and dog`.
+- `key`: The matched key; for example: `@`.
+- `text`: The matched text; for example: `cat`, for `@cat`.
+  - If the `key` is specified in the `multiword` attribute then the matched text can contain multiple words; for example `cat and dog` for `@cat and dog`.
 - `provide`: A function to be called when you have the menu results. Takes a `Promise` with `{matched: boolean, fragment: HTMLElement}` where `matched` tells the element whether a suggestion is available, and `fragment` is the menu content to be displayed on the page.
 
 ```js
-const expander = document.querySelector('text-expander')
+const expander = document.querySelector('trix-mentions')
 
-expander.addEventListener('text-expander-change', function(event) {
+expander.addEventListener('trix-mentions-change', function(event) {
   const {key, provide, text} = event.detail
-  if (key !== ':') return
+  if (key !== '@') return
 
   const suggestions = document.querySelector('.emoji-suggestions').cloneNode(true)
   suggestions.hidden = false
@@ -65,31 +69,57 @@ expander.addEventListener('text-expander-change', function(event) {
 })
 ```
 
-The returned fragment should be consisted of filtered `[role=option]` items to be selected. For example:
+The returned fragment should be consisted of filtered `[role=option]` items to
+be selected. Any attribute whose name it prefixed by `data-trix-attachment-`
+will transformed into camelCase and used to create a [Trix.Attachment][]
+instance under the hood. For example:
 
 ```html
 <ul class="emoji-suggestions" hidden>
-  <li role="option" data-value="🐈">🐈 :cat2:</li>
-  <li role="option" data-value="🐕">🐕 :dog:</li>
+  <li role="option" data-trix-attachment-content="🐈"
+                    data-trix-attachment-content-type="application/vnd.my-application.mention">
+    🐈 @cat2
+  </li>
+  <li role="option" data-trix-attachment-content="🐕"
+                    data-trix-attachment-content-type="application/vnd.my-application.mention">
+    🐕 @dog
+  </li>
 </ul>
 ```
 
-**`text-expander-value`** is fired when an item is selected. In `event.detail` you can find:
+Alternatively, `Trix.Attachment` options can be serialized into a JSON object
+and encoded into a single `[data-trix-attchment]` attribute. Additional
+`data-trix-attachment-` prefixed attributes will be merged in as overrides.
 
-- `key`: The matched key; for example: `:`.
+When the `Trix.Attachment` options are missing a `content` key, the selected
+`[role="option"]` element's [innerHTML][] will serve as the `content:` value.
+
+[Trix.Attachment]: https://github.com/basecamp/trix/tree/1.3.1#inserting-a-content-attachment
+[innerHTML]: https://developer.mozilla.org/en-US/docs/Web/API/Element/innerHTML
+
+**`trix-mentions-value`** is fired when an item is selected. In `event.detail` you can find:
+
+- `key`: The matched key; for example: `@`.
 - `item`: The selected item. This would be one of the `[role=option]`. Use this to work out the `value`.
-- `value`: A null value placeholder to replace the query. To replace the text query, simply re-assign this value.
+- `value`: A null value placeholder to replace the query. To replace the query text, re-assign this value.
 
 ```js
-const expander = document.querySelector('text-expander')
+const expander = document.querySelector('trix-mentions')
 
-expander.addEventListener('text-expander-value', function(event) {
+expander.addEventListener('trix-mentions-value', function(event) {
   const {key, item}  = event.detail
-  if (key === ':') {
-    event.detail.value = item.getAttribute('data-value')
+  if (key === '@') {
+    const contentType = item.getAttribute('data-trix-attachment-content-type')
+    const content = item.getAttribute('data-trix-attachment-content')
+
+    event.detail.value = {content, contentType}
   }
 })
 ```
+
+Often times, when `[role="option"]` elements encode the `Trix.Attachment`
+arguments into their `data-trix-attachment`-prefixed attributes,
+`trix-mentions-value` event listeners can be omitted entirely.
 
 ## Browser support
 

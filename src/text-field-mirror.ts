@@ -40,24 +40,25 @@ const mirrorMap = new WeakMap()
 // Returns an Element attached to the DOM. It is the callers
 // responsibility to cleanup and remove the element after they are
 // finished with their measurements.
-export default function textFieldMirror(
-  textField: HTMLInputElement | HTMLTextAreaElement,
-  markerPosition: number | null
+export default function textFieldMirror<T extends HTMLElement>(
+  textField: T,
+  markerPosition: number | null,
+  valueOf: (element: T) => string
 ): {mirror: HTMLElement; marker: HTMLElement} {
   const nodeName = textField.nodeName.toLowerCase()
-  if (nodeName !== 'textarea' && nodeName !== 'input') {
-    throw new Error('expected textField to a textarea or input')
+  if (nodeName !== 'trix-editor') {
+    throw new Error('expected textField to be a trix-editor')
   }
 
   let mirror = mirrorMap.get(textField)
   if (mirror && mirror.parentElement === textField.parentElement) {
-    mirror.innerHTML = ''
+    for (const element of mirror.children) element.remove()
   } else {
     mirror = document.createElement('div')
     mirrorMap.set(textField, mirror)
     const style = window.getComputedStyle(textField)
     const props = properties.slice(0)
-    if (nodeName === 'textarea') {
+    if (nodeName === 'trix-editor') {
       props.push('white-space:pre-wrap;')
     } else {
       props.push('white-space:nowrap;')
@@ -71,21 +72,21 @@ export default function textFieldMirror(
 
   const marker = document.createElement('span')
   marker.style.cssText = 'position: absolute;'
-  marker.innerHTML = '&nbsp;'
+  marker.insertAdjacentHTML('afterbegin', '&nbsp;')
 
   let before
   let after
   if (typeof markerPosition === 'number') {
-    let text = textField.value.substring(0, markerPosition)
+    let text = valueOf(textField).substring(0, markerPosition)
     if (text) {
       before = document.createTextNode(text)
     }
-    text = textField.value.substring(markerPosition)
+    text = valueOf(textField).substring(markerPosition)
     if (text) {
       after = document.createTextNode(text)
     }
   } else {
-    const text = textField.value
+    const text = valueOf(textField)
     if (text) {
       before = document.createTextNode(text)
     }

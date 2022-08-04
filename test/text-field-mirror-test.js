@@ -1,34 +1,30 @@
-import textFieldMirror from '../dist/text-field-mirror'
+import textFieldMirrorOriginal from '../dist/text-field-mirror'
+import {valueOf} from '../dist/trix-editor-element'
+
+function textFieldMirror(textField, markerPosition) {
+  return textFieldMirrorOriginal(textField, markerPosition, valueOf)
+}
 
 describe('textFieldMirror', function () {
-  let textarea
-  let input
+  let trixEditor
 
   beforeEach(function () {
-    textarea = document.createElement('textarea')
-    input = document.createElement('input')
-    input.type = 'text'
-    document.body.append(textarea, input)
+    trixEditor = document.createElement('trix-editor')
+    document.body.append(trixEditor)
   })
 
   afterEach(function () {
-    document.body.innerHTML = ''
+    for (const element of document.body.children) element.remove()
   })
 
-  it('create mirror for textarea', function () {
-    const {mirror, marker} = textFieldMirror(textarea)
-    assert.ok(mirror)
-    assert.ok(marker)
-  })
-
-  it('create mirror for text input', function () {
-    const {mirror, marker} = textFieldMirror(input)
+  it('create mirror for trixEditor', function () {
+    const {mirror, marker} = textFieldMirror(trixEditor)
     assert.ok(mirror)
     assert.ok(marker)
   })
 
   it('returns an Element attached to the DOM', function () {
-    let {mirror: ancestor} = textFieldMirror(textarea)
+    let {mirror: ancestor} = textFieldMirror(trixEditor)
     while (ancestor.parentNode) {
       ancestor = ancestor.parentNode
     }
@@ -36,12 +32,12 @@ describe('textFieldMirror', function () {
   })
 
   it('returns the same Element on multiple calls', function () {
-    assert.equal(textFieldMirror(textarea).mirror, textFieldMirror(textarea).mirror)
+    assert.equal(textFieldMirror(trixEditor).mirror, textFieldMirror(trixEditor).mirror)
   })
 
   it('returns a new Element when the old mirror is detached from the DOM', function () {
-    const {mirror} = textFieldMirror(textarea)
+    const {mirror} = textFieldMirror(trixEditor)
     mirror.parentNode.removeChild(mirror)
-    assert.notEqual(textFieldMirror(textarea).mirror, mirror)
+    assert.notEqual(textFieldMirror(trixEditor).mirror, mirror)
   })
 })

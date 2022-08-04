@@ -1,8 +1,8 @@
 {
-  "name": "@github/text-expander-element",
-  "version": "2.2.2",
-  "description": "Activates a suggestion menu to expand text snippets as you type.",
-  "repository": "github/text-expander-element",
+  "name": "@thoughtbot/trix-mentions-element",
+  "version": "0.1.0",
+  "description": "Activates a suggestion menu to embed attachments as you type.",
+  "repository": "thoughtbot/trix-mentions-element",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -15,13 +15,13 @@
     "build": "rollup -c",
     "pretest": "npm run build && rollup -c rollup.config.test.js",
     "test": "karma start test/karma.config.cjs",
-    "prepublishOnly": "npm run build",
-    "postpublish": "npm publish --ignore-scripts --@github:registry='https://npm.pkg.github.com'"
+    "prepublishOnly": "npm run build"
   },
   "keywords": [
     "auto-complete",
     "suggestions",
-    "menu"
+    "menu",
+    "trix"
   ],
   "license": "MIT",
   "files": [
@@ -29,7 +29,8 @@
   ],
   "prettier": "@github/prettier-config",
   "dependencies": {
-    "@github/combobox-nav": "^2.0.2"
+    "@github/combobox-nav": "^2.0.2",
+    "trix": "^1.3.1"
   },
   "devDependencies": {
     "@github/prettier-config": "0.0.4",

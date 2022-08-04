@@ -1,6 +1,12 @@
 import Combobox from '@github/combobox-nav'
 import query from './query'
 import textFieldSelectionPosition from './text-field-selection-position'
+import {
+  TrixEditorInput,
+  TrixEditorElementAdapter,
+  assertTrixEditorElement,
+  buildTrixAttachment
+} from './trix-editor-element'
 
 type Match = {
   text: string
@@ -20,9 +26,9 @@ type Key = {
 
 const states = new WeakMap()
 
-class TextExpander {
-  expander: TextExpanderElement
-  input: HTMLInputElement | HTMLTextAreaElement
+class TrixMentionsExpander {
+  expander: TrixMentionsElement
+  input: TrixEditorInput
   menu: HTMLElement | null
   oninput: (event: Event) => void
   onkeydown: (event: KeyboardEvent) => void
@@ -36,7 +42,7 @@ class TextExpander {
   lookBackIndex: number
   interactingWithList: boolean
 
-  constructor(expander: TextExpanderElement, input: HTMLInputElement | HTMLTextAreaElement) {
+  constructor(expander: TrixMentionsElement, input: TrixEditorInput) {
     this.expander = expander
     this.input = input
     this.combobox = null
@@ -53,14 +59,14 @@ class TextExpander {
     this.interactingWithList = false
     input.addEventListener('paste', this.onpaste)
     input.addEventListener('input', this.oninput)
-    ;(input as HTMLElement).addEventListener('keydown', this.onkeydown)
+    ;(input.element as HTMLElement).addEventListener('keydown', this.onkeydown)
     input.addEventListener('blur', this.onblur)
   }
 
   destroy() {
     this.input.removeEventListener('paste', this.onpaste)
     this.input.removeEventListener('input', this.oninput)
-    ;(this.input as HTMLElement).removeEventListener('keydown', this.onkeydown)
+    ;(this.input.element as HTMLElement).removeEventListener('keydown', this.onkeydown)
     this.input.removeEventListener('blur', this.onblur)
   }
 
@@ -71,18 +77,23 @@ class TextExpander {
   }
 
   private activate(match: Match, menu: HTMLElement) {
-    if (this.input !== document.activeElement && this.input !== document.activeElement?.shadowRoot?.activeElement) {
+    if (
+      this.input.element !== document.activeElement &&
+      this.input.element !== document.activeElement?.shadowRoot?.activeElement
+    ) {
       return
     }
 
     this.deactivate()
     this.menu = menu
 
-    if (!menu.id) menu.id = `text-expander-${Math.floor(Math.random() * 100000).toString()}`
+    if (!menu.id) menu.id = `trix-mentions-${Math.floor(Math.random() * 100000).toString()}`
     this.expander.append(menu)
-    this.combobox = new Combobox(this.input, menu)
+    this.combobox = new Combobox((this.input as unknown) as HTMLTextAreaElement, menu)
+    this.input.setAttribute('role', 'combobox')
+    this.input.setAttribute('aria-multiline', 'false')
 
-    const {top, left} = textFieldSelectionPosition(this.input, match.position)
+    const {top, left} = textFieldSelectionPosition(this.input.element, match.position)
     menu.style.top = `${top}px`
     menu.style.left = `${left}px`
 
@@ -104,6 +115,8 @@ class TextExpander {
 
     this.combobox.destroy()
     this.combobox = null
+    this.input.removeAttribute('aria-multiline')
+    this.input.setAttribute('role', 'textbox')
     menu.remove()
 
     return true
@@ -117,27 +130,27 @@ class TextExpander {
     const match = this.match
     if (!match) return
 
-    const beginning = this.input.value.substring(0, match.position - match.key.length)
-    const remaining = this.input.value.substring(match.position + match.text.length)
+    const selectionStart = match.position - match.key.length
+    const selectionEnd = match.position + match.text.length
 
     const detail = {item, key: match.key, value: null}
-    const canceled = !this.expander.dispatchEvent(new CustomEvent('text-expander-value', {cancelable: true, detail}))
+    const canceled = !this.expander.dispatchEvent(new CustomEvent('trix-mentions-value', {cancelable: true, detail}))
     if (canceled) return
 
-    if (!detail.value) return
-    const value = `${detail.value} `
+    const attachment = buildTrixAttachment(detail.value || item)
+    if (!attachment) return
 
-    this.input.value = beginning + value + remaining
+    this.input.editor.setSelectedRange([selectionStart, selectionEnd])
+    this.input.editor.deleteInDirection('backward')
+    this.input.editor.insertAttachment(attachment)
 
-    const cursor = beginning.length + value.length
+    const cursor = this.input.selectionEnd
 
     this.deactivate()
     this.input.focus({
       preventScroll: true
     })
 
-    this.input.selectionStart = cursor
-    this.input.selectionEnd = cursor
     this.lookBackIndex = cursor
     this.match = null
   }
@@ -202,7 +215,7 @@ class TextExpander {
     const providers: Array<Promise<Result> | Result> = []
     const provide = (result: Promise<Result> | Result) => providers.push(result)
     const canceled = !this.expander.dispatchEvent(
-      new CustomEvent('text-expander-change', {cancelable: true, detail: {provide, text: match.text, key: match.key}})
+      new CustomEvent('trix-mentions-change', {cancelable: true, detail: {provide, text: match.text, key: match.key}})
     )
     if (canceled) return
 
@@ -226,7 +239,7 @@ class TextExpander {
     }
   }
 }
-export default class TextExpanderElement extends HTMLElement {
+export default class TrixMentionsElement extends HTMLElement {
   get keys(): Key[] {
     const keysAttr = this.getAttribute('keys')
     const keys = keysAttr ? keysAttr.split(' ') : []
@@ -239,21 +252,21 @@ export default class TextExpanderElement extends HTMLElement {
   }
 
   connectedCallback(): void {
-    const input = this.querySelector('input[type="text"], textarea')
-    if (!(input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement)) return
-    const state = new TextExpander(this, input)
+    const input = this.querySelector('trix-editor')
+    assertTrixEditorElement(input)
+    const state = new TrixMentionsExpander(this, new TrixEditorElementAdapter(input))
     states.set(this, state)
   }
 
   disconnectedCallback(): void {
-    const state: TextExpander = states.get(this)
+    const state: TrixMentionsExpander = states.get(this)
     if (!state) return
     state.destroy()
     states.delete(this)
   }
 
   dismiss(): void {
-    const state: TextExpander = states.get(this)
+    const state: TrixMentionsExpander = states.get(this)
     if (!state) return
     state.dismissMenu()
   }

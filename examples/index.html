@@ -2,37 +2,51 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>text-expander demo</title>
+    <title>trix-mentions demo</title>
     <style>
       [aria-selected='true'] {
         background: #eee;
       }
+
+      .trix-content * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      .trix-content .attachment {
+        display: inline-block;
+        position: relative;
+        max-width: 100%;
+      }
     </style>
+    <script src="https://unpkg.com/trix@1.3.1/dist/trix.js"></script>
+    <link href="https://unpkg.com/trix@1.3.1/dist/trix.css" media="screen" rel="stylesheet"/>
   </head>
   <body>
-    <h1>text-expanded element examples</h1>
+    <h1>trix-mentions element examples</h1>
     <p>Use <code>#</code> to trigger the expander</p>
 
-    <h2>Normal text-expander element</h2>
-    <text-expander keys="#">
-      <textarea autofocus rows="10" cols="40"></textarea>
-    </text-expander>
+    <h2>Normal trix-mentions element</h2>
+    <trix-mentions keys="#">
+      <trix-editor class="trix-content" autofocus></trix-editor>
+    </trix-mentions>
 
-    <h2>Multiword text-expander element</h2>
-    <text-expander keys="#" multiword="#">
-      <textarea autofocus rows="10" cols="40"></textarea>
-    </text-expander>
+    <h2>Multiword trix-mentions element</h2>
+    <trix-mentions keys="#" multiword="#">
+      <trix-editor class="trix-content" autofocus></trix-editor>
+    </trix-mentions>
 
     <script type="text/javascript">
-      const expanders = document.querySelectorAll('text-expander')
+      const expanders = document.querySelectorAll('trix-mentions')
       for (const expander of expanders) {
-        expander.addEventListener('text-expander-change', event => {
+        expander.addEventListener('trix-mentions-change', event => {
           const {key, provide, text} = event.detail
           if (key === '#') {
             const menu = document.createElement('ul')
             menu.role = 'listbox'
             for (const issue of [
-              '#1 Implement a text-expander element',
+              '#1 Implement a trix-mentions element',
               '#2 Implement multi word option',
               '#3 Fix tpoy',
               '#4 Implement #12',
@@ -42,22 +56,17 @@
                 const item = document.createElement('li')
                 item.setAttribute('role', 'option')
                 item.textContent = issue
-                item.setAttribute('data-value', issue.split(' ')[0])
-                item.id = `option-${issue}`
+                item.setAttribute('data-trix-attachment-content-type', 'application/vnd.trix-mentions.mention')
+                item.id = `option-${item.value}`
                 menu.append(item)
               }
             }
             provide(Promise.resolve({matched: true, fragment: menu}))
           }
         })
-
-        expander.addEventListener('text-expander-value', function(event) {
-          const {key, item} = event.detail
-          if (key === '#') event.detail.value = item.getAttribute('data-value') || item.textContent
-        })
       }
     </script>
-    <script type="module" src="https://unpkg.com/@github/text-expander-element@latest/dist/bundle.js"></script>
+    <script type="module" src="https://unpkg.com/@thoughtbot/trix-mentions-element@latest/dist/bundle.js"></script>
     <!-- <script src="../dist/bundle.js" type="module"></script> -->
   </body>
 </html>
