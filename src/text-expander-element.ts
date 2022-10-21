@@ -140,6 +140,10 @@ class TextExpander {
     this.input.selectionEnd = cursor
     this.lookBackIndex = cursor
     this.match = null
+
+    this.expander.dispatchEvent(
+      new CustomEvent('text-expander-committed', {cancelable: false, detail: {input: this.input}})
+    )
   }
 
   private onBlur() {

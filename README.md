@@ -91,6 +91,18 @@ expander.addEventListener('text-expander-value', function(event) {
 })
 ```
 
+**`text-expander-committed`** is fired after the underlying `input` value has been updated in the DOM. In `event.detail` you can find:
+
+- `input`: The `HTMLInputElement` or `HTMLTextAreaElement` that just had `value` changes committed to the DOM.
+
+```js
+const expander = document.querySelector('text-expander')
+
+expander.addEventListener('text-expander-committed', function(event) {
+  const {input}  = event.detail
+})
+```
+
 ## Browser support
 
 Browsers without native [custom element support][support] require a [polyfill][].
