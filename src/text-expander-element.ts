@@ -125,7 +125,13 @@ class TextExpander {
     if (canceled) return
 
     if (!detail.value) return
-    const value = `${detail.value} `
+    
+    let spacer = ' '
+    if (detail.continue) {
+      spacer = ''
+    }
+    
+    const value = `${detail.value}${spacer}`
 
     this.input.value = beginning + value + remaining
 
@@ -138,8 +144,11 @@ class TextExpander {
 
     this.input.selectionStart = cursor
     this.input.selectionEnd = cursor
-    this.lookBackIndex = cursor
-    this.match = null
+    
+    if (!detail.continue) {
+      this.lookBackIndex = cursor
+      this.match = null
+    }
 
     this.expander.dispatchEvent(
       new CustomEvent('text-expander-committed', {cancelable: false, detail: {input: this.input}})
