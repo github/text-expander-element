@@ -79,6 +79,7 @@ The returned fragment should be consisted of filtered `[role=option]` items to b
 - `key`: The matched key; for example: `:`.
 - `item`: The selected item. This would be one of the `[role=option]`. Use this to work out the `value`.
 - `value`: A null value placeholder to replace the query. To replace the text query, simply re-assign this value.
+- `continue`: A boolean value to specify whether to continue autocompletion after inserting a value. Defaults to `false`. If set to `true`, will not add a space after inserted value and will keep firing the `text-expander-change` event.
 
 ```js
 const expander = document.querySelector('text-expander')
