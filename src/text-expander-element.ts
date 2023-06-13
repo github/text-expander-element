@@ -127,11 +127,11 @@ class TextExpander {
     if (!detail.value) return
 
     const suffix = this.expander.getAttribute('suffix') ?? ' '
-    
+
     if (detail.continue) {
       suffix = ''
     }
-    
+
     const value = `${detail.value}${suffix}`
 
     this.input.value = beginning + value + remaining
