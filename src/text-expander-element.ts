@@ -126,7 +126,7 @@ class TextExpander {
 
     if (!detail.value) return
 
-    const suffix = this.expander.getAttribute('suffix') ?? ' '
+    let suffix = this.expander.getAttribute('suffix') ?? ' '
 
     if (detail.continue) {
       suffix = ''
