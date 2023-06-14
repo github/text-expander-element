@@ -92,6 +92,77 @@ describe('text-expander element', function () {
 
       assert.deepEqual(receivedText, expectedText)
     })
+
+    it('dispatches value event after selecting item and closes', async function () {
+      const expander = document.querySelector('text-expander')
+      const input = expander.querySelector('textarea')
+      const menu = document.createElement('ul')
+      const item = document.createElement('li')
+      item.setAttribute('role', 'option')
+      menu.appendChild(item)
+
+      expander.addEventListener('text-expander-change', event => {
+        const {provide} = event.detail
+        provide(Promise.resolve({matched: true, fragment: menu}))
+      })
+
+      expander.addEventListener('text-expander-value', event => {
+        event.detail.value = ':1'
+      })
+
+      input.focus()
+      triggerInput(input, ':')
+      await waitForAnimationFrame()
+      assert.exists(expander.querySelector('ul'))
+
+      const result = once(expander, 'text-expander-value')
+      expander.querySelector('li').click()
+      const event = await result
+      assert.equal(false, event.detail.continue)
+
+      assert.equal(input.value, ':1 ')
+
+      await waitForAnimationFrame()
+      assert.isNull(expander.querySelector('ul'))
+    })
+
+    it('dispatches value event after selecting item and keeps menu open', async function () {
+      const expander = document.querySelector('text-expander')
+      const input = expander.querySelector('textarea')
+      const menu = document.createElement('ul')
+      const item = document.createElement('li')
+      item.setAttribute('role', 'option')
+      menu.appendChild(item)
+
+      expander.addEventListener('text-expander-change', event => {
+        const {provide} = event.detail
+        // eslint-disable-next-line no-console
+        console.log('ASDFSDF', event.detail)
+        provide(Promise.resolve({matched: true, fragment: menu}))
+      })
+
+      expander.addEventListener('text-expander-value', event => {
+        event.detail.value = ':1'
+        event.detail.continue = true
+      })
+
+      input.focus()
+      triggerInput(input, ':')
+      await waitForAnimationFrame()
+      assert.exists(expander.querySelector('ul'))
+
+      const result = once(expander, 'text-expander-value')
+      expander.querySelector('li').click()
+      const event = await result
+      assert.equal(true, event.detail.continue)
+
+      triggerInput(input, '#1', true)
+
+      assert.equal(input.value, ':1#1')
+
+      await waitForAnimationFrame()
+      assert.exists(expander.querySelector('ul'))
+    })
   })
 
   describe('multi-word scenarios', function () {

@@ -120,12 +120,18 @@ class TextExpander {
     const beginning = this.input.value.substring(0, match.position - match.key.length)
     const remaining = this.input.value.substring(match.position + match.text.length)
 
-    const detail = {item, key: match.key, value: null}
+    const detail = {item, key: match.key, value: null, continue: false}
     const canceled = !this.expander.dispatchEvent(new CustomEvent('text-expander-value', {cancelable: true, detail}))
     if (canceled) return
 
     if (!detail.value) return
-    const suffix = this.expander.getAttribute('suffix') ?? ' '
+
+    let suffix = this.expander.getAttribute('suffix') ?? ' '
+
+    if (detail.continue) {
+      suffix = ''
+    }
+
     const value = `${detail.value}${suffix}`
 
     this.input.value = beginning + value + remaining
@@ -139,8 +145,11 @@ class TextExpander {
 
     this.input.selectionStart = cursor
     this.input.selectionEnd = cursor
-    this.lookBackIndex = cursor
-    this.match = null
+
+    if (!detail.continue) {
+      this.lookBackIndex = cursor
+      this.match = null
+    }
 
     this.expander.dispatchEvent(
       new CustomEvent('text-expander-committed', {cancelable: false, detail: {input: this.input}})
