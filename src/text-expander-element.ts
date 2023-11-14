@@ -20,6 +20,25 @@ type Key = {
 
 const states = new WeakMap()
 
+function isTopLayer(el: Element) {
+  try {
+    if (el.matches(':popover-open')) return true
+  } catch {
+    /* fall through */
+  }
+  try {
+    if (el.matches('dialog:modal')) return true
+  } catch {
+    /* fall through */
+  }
+  try {
+    if (el.matches(':fullscreen')) return true
+  } catch {
+    /* fall through */
+  }
+  return false
+}
+
 class TextExpander {
   expander: TextExpanderElement
   input: HTMLInputElement | HTMLTextAreaElement
@@ -82,7 +101,14 @@ class TextExpander {
     this.expander.append(menu)
     this.combobox = new Combobox(this.input, menu)
 
-    const {top, left} = textFieldSelectionPosition(this.input, match.position)
+    this.expander.dispatchEvent(new Event('text-expander-activate'))
+
+    let {top, left} = textFieldSelectionPosition(this.input, match.position)
+    if (isTopLayer(menu)) {
+      const rect = this.input.getBoundingClientRect()
+      top += rect.top
+      left += rect.left
+    }
     menu.style.top = `${top}px`
     menu.style.left = `${left}px`
 
@@ -97,6 +123,9 @@ class TextExpander {
   private deactivate() {
     const menu = this.menu
     if (!menu || !this.combobox) return false
+
+    this.expander.dispatchEvent(new Event('text-expander-deactivate'))
+
     this.menu = null
 
     menu.removeEventListener('combobox-commit', this.oncommit)

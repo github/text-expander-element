@@ -105,6 +105,10 @@ expander.addEventListener('text-expander-committed', function(event) {
 })
 ```
 
+**`text-expander-activate`** is fired just after the menu has been assigned and appended to the DOM, and just before it is about to be positioned near the text to expand. This is useful for assigning classes or calling imperative methods to show the menu, such as `.showPopover()`.
+
+**`text-expander-dectivate`** is fired just before the menu is goind to be unassigned and removed from the DOM. This is useful for removing classes or running cleanup like removing from caches.
+
 ## Browser support
 
 Browsers without native [custom element support][support] require a [polyfill][].
