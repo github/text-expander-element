@@ -108,6 +108,10 @@ class TextExpander {
       const rect = this.input.getBoundingClientRect()
       top += rect.top
       left += rect.left
+      if (getComputedStyle(menu).position === 'absolute') {
+        top += window.scrollY
+        left += window.scrollX
+      }
     }
     menu.style.top = `${top}px`
     menu.style.left = `${left}px`
