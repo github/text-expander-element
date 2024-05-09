@@ -29,7 +29,8 @@
   ],
   "prettier": "@github/prettier-config",
   "dependencies": {
-    "@github/combobox-nav": "^2.0.2"
+    "@github/combobox-nav": "^2.0.2",
+    "dom-input-range": "^1.1.3"
   },
   "devDependencies": {
     "@github/prettier-config": "0.0.4",
