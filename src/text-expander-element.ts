@@ -1,6 +1,6 @@
 import Combobox from '@github/combobox-nav'
 import query from './query'
-import textFieldSelectionPosition from './text-field-selection-position'
+import {InputRange} from 'dom-input-range'
 
 type Match = {
   text: string
@@ -103,7 +103,7 @@ class TextExpander {
 
     this.expander.dispatchEvent(new Event('text-expander-activate'))
 
-    let {top, left} = textFieldSelectionPosition(this.input, match.position)
+    let {top, left} = new InputRange(this.input, match.position).getBoundingClientRect()
     if (isTopLayer(menu)) {
       const rect = this.input.getBoundingClientRect()
       top += rect.top

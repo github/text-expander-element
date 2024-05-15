@@ -8,5 +8,11 @@
   },
   "globals": {
     "assert": true
+  },
+  "rules": {
+    "github/no-inner-html": "off",
+    "filenames/match-regex": "off",
+    // Linting currently runs as a pre-build step, so the dependent files may not exist yet by the time linting is run
+    "import/no-unresolved": "off"
   }
 }
