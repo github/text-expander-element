@@ -4,8 +4,15 @@
     <meta charset="utf-8" />
     <title>text-expander demo</title>
     <style>
-      [aria-selected='true'] {
-        background: #eee;
+      .menu {
+        position: absolute;
+        list-style-type: none;
+        padding: 0;
+        background: lightgray;
+
+        [aria-selected='true'] {
+          background: #eee;
+        }
       }
     </style>
   </head>
@@ -30,6 +37,7 @@
           const {key, provide, text} = event.detail
           if (key === '#') {
             const menu = document.createElement('ul')
+            menu.classList.add('menu')
             menu.role = 'listbox'
             for (const issue of [
               '#1 Implement a text-expander element',
