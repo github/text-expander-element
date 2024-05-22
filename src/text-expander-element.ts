@@ -20,25 +20,6 @@ type Key = {
 
 const states = new WeakMap()
 
-function isTopLayer(el: Element) {
-  try {
-    if (el.matches(':popover-open')) return true
-  } catch {
-    /* fall through */
-  }
-  try {
-    if (el.matches('dialog:modal')) return true
-  } catch {
-    /* fall through */
-  }
-  try {
-    if (el.matches(':fullscreen')) return true
-  } catch {
-    /* fall through */
-  }
-  return false
-}
-
 class TextExpander {
   expander: TextExpanderElement
   input: HTMLInputElement | HTMLTextAreaElement
@@ -103,18 +84,20 @@ class TextExpander {
 
     this.expander.dispatchEvent(new Event('text-expander-activate'))
 
-    let {top, left} = new InputRange(this.input, match.position).getBoundingClientRect()
-    if (isTopLayer(menu)) {
-      const rect = this.input.getBoundingClientRect()
-      top += rect.top
-      left += rect.left
-      if (getComputedStyle(menu).position === 'absolute') {
-        top += window.scrollY
-        left += window.scrollX
-      }
-    }
-    menu.style.top = `${top}px`
-    menu.style.left = `${left}px`
+    const caretRect = new InputRange(this.input, match.position).getBoundingClientRect()
+    const nominalPosition = {top: caretRect.top + caretRect.height, left: caretRect.left}
+    menu.style.top = `${nominalPosition.top}px`
+    menu.style.left = `${nominalPosition.left}px`
+
+    // Nominal position is relative to entire document, but the menu could be positioned relative to a container if
+    // it is not `fixed` or on the top layer
+    const actualPosition = menu.getBoundingClientRect()
+
+    const topDelta = actualPosition.top - nominalPosition.top
+    if (topDelta !== 0) menu.style.top = `${nominalPosition.top - topDelta}px`
+
+    const leftDelta = actualPosition.left - nominalPosition.left
+    if (leftDelta !== 0) menu.style.left = `${nominalPosition.left - leftDelta}px`
 
     this.combobox.start()
     menu.addEventListener('combobox-commit', this.oncommit)
