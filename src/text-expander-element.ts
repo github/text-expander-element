@@ -105,9 +105,6 @@ class TextExpander {
       top: targetPosition.top - currentPosition.top
     }
 
-    // eslint-disable-next-line no-console
-    console.log(delta)
-
     if (delta.left !== 0 || delta.top !== 0) {
       // Use computedStyle to avoid nesting calc() deeper and deeper
       const currentStyle = getComputedStyle(menu)
