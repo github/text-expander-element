@@ -84,20 +84,7 @@ class TextExpander {
 
     this.expander.dispatchEvent(new Event('text-expander-activate'))
 
-    const caretRect = new InputRange(this.input, match.position).getBoundingClientRect()
-    const nominalPosition = {top: caretRect.top + caretRect.height, left: caretRect.left}
-    menu.style.top = `${nominalPosition.top}px`
-    menu.style.left = `${nominalPosition.left}px`
-
-    // Nominal position is relative to entire document, but the menu could be positioned relative to a container if
-    // it is not `fixed` or on the top layer
-    const actualPosition = menu.getBoundingClientRect()
-
-    const topDelta = actualPosition.top - nominalPosition.top
-    if (topDelta !== 0) menu.style.top = `${nominalPosition.top - topDelta}px`
-
-    const leftDelta = actualPosition.left - nominalPosition.left
-    if (leftDelta !== 0) menu.style.left = `${nominalPosition.left - leftDelta}px`
+    this.positionMenu(menu, match.position)
 
     this.combobox.start()
     menu.addEventListener('combobox-commit', this.oncommit)
@@ -105,6 +92,30 @@ class TextExpander {
 
     // Focus first menu item.
     this.combobox.navigate(1)
+  }
+
+  private positionMenu(menu: HTMLElement, position: number) {
+    const caretRect = new InputRange(this.input, position).getBoundingClientRect()
+    const targetPosition = {left: caretRect.left, top: caretRect.top + caretRect.height}
+
+    const currentPosition = menu.getBoundingClientRect()
+
+    const delta = {
+      left: targetPosition.left - currentPosition.left,
+      top: targetPosition.top - currentPosition.top
+    }
+
+    // eslint-disable-next-line no-console
+    console.log(delta)
+
+    if (delta.left !== 0 || delta.top !== 0) {
+      // Use computedStyle to avoid nesting calc() deeper and deeper
+      const currentStyle = getComputedStyle(menu)
+
+      // Using `calc` avoids having to parse the current pixel value
+      menu.style.left = currentStyle.left ? `calc(${currentStyle.left} + ${delta.left}px)` : `${delta.left}px`
+      menu.style.top = currentStyle.top ? `calc(${currentStyle.top} + ${delta.top}px)` : `${delta.top}px`
+    }
   }
 
   private deactivate() {
