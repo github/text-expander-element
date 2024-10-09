@@ -276,6 +276,10 @@ export default class TextExpanderElement extends HTMLElement {
     return keys.map(key => ({key, multiWord: globalMultiWord || multiWord.includes(key)}))
   }
 
+  set keys(value: string) {
+    this.setAttribute('keys', value)
+  }
+
   connectedCallback(): void {
     const input = this.querySelector('input[type="text"], textarea')
     if (!(input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement)) return
