@@ -192,6 +192,28 @@ describe('text-expander element', function () {
       )
     })
 
+    it('sets keys', function () {
+      const expander = document.querySelector('text-expander')
+      assert.deepEqual(
+        [
+          {key: '@', multiWord: false},
+          {key: '#', multiWord: true},
+          {key: '[[', multiWord: true}
+        ],
+        expander.keys
+      )
+
+      expander.keys = '@ [['
+
+      assert.deepEqual(
+        [
+          {key: '@', multiWord: false},
+          {key: '[[', multiWord: true}
+        ],
+        expander.keys
+      )
+    })
+
     it('dispatches change event for multi-word', async function () {
       const expander = document.querySelector('text-expander')
       const input = expander.querySelector('textarea')
