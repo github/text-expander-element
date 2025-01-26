@@ -22,7 +22,7 @@ export type TextExpanderChangeEvent = Event & {
   detail?: {
     key: string
     text: string
-    provide: (result: TextExpanderResult | Promise<TextExpanderResult>) => void
+    provide: (result: Promise<TextExpanderResult> | TextExpanderResult) => void
   }
 }
 
