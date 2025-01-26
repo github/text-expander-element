@@ -9,7 +9,7 @@ export type TextExpanderMatch = {
 }
 
 export type TextExpanderResult = {
-  fragment: HTMLElement
+  fragment?: HTMLElement
   matched: boolean
 }
 
