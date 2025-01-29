@@ -2,20 +2,28 @@ import Combobox from '@github/combobox-nav'
 import query from './query'
 import {InputRange} from 'dom-input-range'
 
-type Match = {
+export type TextExpanderMatch = {
   text: string
   key: string
   position: number
 }
 
-type Result = {
-  fragment: HTMLElement
+export type TextExpanderResult = {
+  fragment?: HTMLElement
   matched: boolean
 }
 
-type Key = {
+export type TextExpanderKey = {
   key: string
   multiWord: boolean
+}
+
+export type TextExpanderChangeEvent = Event & {
+  detail?: {
+    key: string
+    text: string
+    provide: (result: Promise<TextExpanderResult> | TextExpanderResult) => void
+  }
 }
 
 const states = new WeakMap()
@@ -31,7 +39,7 @@ class TextExpander {
   onblur: (event: Event) => void
   onmousedown: (event: Event) => void
   combobox: Combobox | null
-  match: Match | null
+  match: TextExpanderMatch | null
   justPasted: boolean
   lookBackIndex: number
   interactingWithList: boolean
@@ -70,7 +78,7 @@ class TextExpander {
     }
   }
 
-  private activate(match: Match, menu: HTMLElement) {
+  private activate(match: TextExpanderMatch, menu: HTMLElement) {
     if (this.input !== document.activeElement && this.input !== document.activeElement?.shadowRoot?.activeElement) {
       return
     }
@@ -218,7 +226,7 @@ class TextExpander {
     }
   }
 
-  findMatch(): Match | void {
+  findMatch(): TextExpanderMatch | void {
     const cursor = this.input.selectionEnd || 0
     const text = this.input.value
     if (cursor <= this.lookBackIndex) {
@@ -236,12 +244,14 @@ class TextExpander {
     }
   }
 
-  async notifyProviders(match: Match): Promise<HTMLElement | void> {
-    const providers: Array<Promise<Result> | Result> = []
-    const provide = (result: Promise<Result> | Result) => providers.push(result)
-    const canceled = !this.expander.dispatchEvent(
-      new CustomEvent('text-expander-change', {cancelable: true, detail: {provide, text: match.text, key: match.key}})
-    )
+  async notifyProviders(match: TextExpanderMatch): Promise<HTMLElement | void> {
+    const providers: Array<Promise<TextExpanderResult> | TextExpanderResult> = []
+    const provide = (result: Promise<TextExpanderResult> | TextExpanderResult) => providers.push(result)
+    const changeEvent = new CustomEvent('text-expander-change', {
+      cancelable: true,
+      detail: {provide, text: match.text, key: match.key}
+    }) as TextExpanderChangeEvent
+    const canceled = !this.expander.dispatchEvent(changeEvent)
     if (canceled) return
 
     const all = await Promise.all(providers)
@@ -265,7 +275,7 @@ class TextExpander {
   }
 }
 export default class TextExpanderElement extends HTMLElement {
-  get keys(): Key[] {
+  get keys(): TextExpanderKey[] {
     const keysAttr = this.getAttribute('keys')
     const keys = keysAttr ? keysAttr.split(' ') : []
 
