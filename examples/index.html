@@ -30,12 +30,51 @@
       <textarea autofocus rows="10" cols="40"></textarea>
     </text-expander>
 
+    <h2>Multiword and multikey text-expander element</h2>
+    <text-expander keys=": #" multiword="#">
+      <textarea autofocus rows="10" cols="40"></textarea>
+    </text-expander>
+
+    <h2>Multiword and multikey text-expander element with random delay</h2>
+    <text-expander keys=": #" multiword="#" _random_delay="">
+      <textarea autofocus rows="10" cols="40"></textarea>
+    </text-expander>    
+
     <script type="text/javascript">
+      const emojis = [
+        { emoji: "😀", names: ["smile", "happy"] },
+        { emoji: "❤️", names: ["heart", "love"] },
+        { emoji: "🔥", names: ["fire", "hot"] },
+        { emoji: "⭐", names: ["star", "favorite"] },
+        { emoji: "🚀", names: ["rocket", "fast"] }
+      ];
+      
       const expanders = document.querySelectorAll('text-expander')
       for (const expander of expanders) {
         expander.addEventListener('text-expander-change', event => {
           const {key, provide, text} = event.detail
-          if (key === '#') {
+          if (key === ':') {
+            const menu = document.createElement('ul')
+            menu.classList.add('menu')
+            menu.role = 'listbox'
+            for (const {emoji, names} of emojis) {
+              if (names.some(name => name.includes(text.toLowerCase()))) {
+                const item = document.createElement('li')
+                item.setAttribute('role', 'option')
+                item.textContent = `${emoji} ${names[0]}`
+                item.setAttribute('data-value', emoji)
+                menu.append(item)
+              }
+            }
+            // Async test with random delay
+            if (expander.hasAttribute('_random_delay')) {
+              provide(new Promise(resolve => {
+                setTimeout(() => resolve({matched: true, fragment: menu}), Math.random() * 1000)
+              }))
+            } else {
+              provide(Promise.resolve({matched: true, fragment: menu}))
+            }
+          } else if (key === '#') {
             const menu = document.createElement('ul')
             menu.classList.add('menu')
             menu.role = 'listbox'
@@ -55,13 +94,25 @@
                 menu.append(item)
               }
             }
-            provide(Promise.resolve({matched: true, fragment: menu}))
+            // Async test with random delay
+            if (expander.hasAttribute('_random_delay')) {
+              provide(new Promise(resolve => {
+                setTimeout(() => resolve({matched: true, fragment: menu}), Math.random() * 1000)
+              }))
+            } else {
+              // For normal expander - synchronous response
+              provide(Promise.resolve({matched: true, fragment: menu}))
+            }
           }
         })
 
         expander.addEventListener('text-expander-value', function(event) {
           const {key, item} = event.detail
-          if (key === '#') event.detail.value = item.getAttribute('data-value') || item.textContent
+          if (key === '#') {
+            event.detail.value = item.getAttribute('data-value') || item.textContent
+          } else if (key === ':') {
+            event.detail.value = item.getAttribute('data-value')
+          }
         })
       }
     </script>

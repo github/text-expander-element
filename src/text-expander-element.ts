@@ -201,6 +201,10 @@ class TextExpander {
     this.justPasted = true
   }
 
+  private isMatchStillValid(match: TextExpanderMatch): boolean {
+    return match.position <= this.input.value.length
+  }
+
   async onInput() {
     if (this.justPasted) {
       this.justPasted = false
@@ -213,7 +217,11 @@ class TextExpander {
       const menu = await this.notifyProviders(match)
 
       // Text was cleared while waiting on async providers.
-      if (!this.match) return
+      if (!this.match || !this.isMatchStillValid(match)) {
+        this.match = null
+        this.deactivate()
+        return
+      }
 
       if (menu) {
         this.activate(match, menu)
