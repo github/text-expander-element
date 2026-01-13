@@ -103,7 +103,9 @@ class TextExpander {
   }
 
   private positionMenu(menu: HTMLElement, position: number) {
-    const caretRect = new InputRange(this.input, position).getBoundingClientRect()
+    // Clamp position to valid range to avoid IndexSizeError when input text changes
+    const clampedPosition = Math.min(position, this.input.value.length)
+    const caretRect = new InputRange(this.input, clampedPosition).getBoundingClientRect()
     const targetPosition = {left: caretRect.left, top: caretRect.top + caretRect.height}
 
     const currentPosition = menu.getBoundingClientRect()
