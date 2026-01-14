@@ -2,17 +2,24 @@ name: Publish
 permissions:
   contents: read
   packages: write
+  id-token: write # Required for OIDC
 
 on:
   release:
     types: [created]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to publish (e.g., v1.2.3)'
+        required: true
+        type: string
 
 jobs:
   publish-npm:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
           registry-url: https://registry.npmjs.org/
@@ -21,7 +28,5 @@ jobs:
       - run: npm test
       - run: npm version ${TAG_NAME} --git-tag-version=false
         env:
-          TAG_NAME: ${{ github.event.release.tag_name }}
-      - run: npm whoami; npm --ignore-scripts publish
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
+          TAG_NAME: ${{ github.event.release.tag_name || github.event.inputs.version }}
+      - run: npm --ignore-scripts publish
