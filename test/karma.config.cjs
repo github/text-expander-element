@@ -1,5 +1,3 @@
-process.env.CHROME_BIN = require('chromium').path
-
 module.exports = function (config) {
   config.set({
     frameworks: ['mocha', 'chai'],

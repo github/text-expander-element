@@ -25,3 +25,4 @@ jobs:
           npm test
         env:
           CI: true
+          CHROME_BIN: google-chrome
