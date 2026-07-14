@@ -34,6 +34,7 @@
   },
   "devDependencies": {
     "@github/prettier-config": "0.0.4",
+    "@types/node": "^20.19.43",
     "chai": "^4.3.4",
     "eslint": "^8.0.1",
     "eslint-plugin-github": "^4.10.2",
