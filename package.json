@@ -48,6 +48,9 @@
     "rollup-plugin-node-resolve": "^5.2.0",
     "typescript": "^5.4.5"
   },
+  "overrides": {
+    "browserslist": "4.23.0"
+  },
   "eslintIgnore": [
     "build/",
     "dist/",
