@@ -66,6 +66,8 @@ class TextExpander {
   }
 
   destroy() {
+    this.match = null
+    this.deactivate()
     this.input.removeEventListener('paste', this.onpaste)
     this.input.removeEventListener('input', this.oninput)
     ;(this.input as HTMLElement).removeEventListener('keydown', this.onkeydown)
@@ -310,8 +312,8 @@ export default class TextExpanderElement extends HTMLElement {
   disconnectedCallback(): void {
     const state: TextExpander = states.get(this)
     if (!state) return
-    state.destroy()
     states.delete(this)
+    state.destroy()
   }
 
   dismiss(): void {
