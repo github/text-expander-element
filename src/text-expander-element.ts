@@ -66,12 +66,12 @@ class TextExpander {
   }
 
   destroy() {
-    this.match = null
-    this.deactivate()
     this.input.removeEventListener('paste', this.onpaste)
     this.input.removeEventListener('input', this.oninput)
     ;(this.input as HTMLElement).removeEventListener('keydown', this.onkeydown)
     this.input.removeEventListener('blur', this.onblur)
+    this.match = null
+    this.deactivate()
   }
 
   dismissMenu() {
@@ -93,6 +93,7 @@ class TextExpander {
     this.combobox = new Combobox(this.input, menu)
 
     this.expander.dispatchEvent(new Event('text-expander-activate'))
+    if (!this.combobox || this.menu !== menu) return
 
     this.positionMenu(menu, match.position)
 
@@ -129,17 +130,17 @@ class TextExpander {
 
   private deactivate() {
     const menu = this.menu
-    if (!menu || !this.combobox) return false
+    const combobox = this.combobox
+    if (!menu || !combobox) return false
+    this.menu = null
+    this.combobox = null
 
     this.expander.dispatchEvent(new Event('text-expander-deactivate'))
-
-    this.menu = null
 
     menu.removeEventListener('combobox-commit', this.oncommit)
     menu.removeEventListener('mousedown', this.onmousedown)
 
-    this.combobox.destroy()
-    this.combobox = null
+    combobox.destroy()
     menu.remove()
 
     return true
