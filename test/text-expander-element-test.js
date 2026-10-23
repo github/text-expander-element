@@ -72,6 +72,214 @@ describe('text-expander element', function () {
       assert.isNull(expander.querySelector('ul'))
     })
 
+    it('stops activation when an activation listener disconnects the element', async function () {
+      const expander = document.querySelector('text-expander')
+      const input = expander.querySelector('textarea')
+      expander.remove()
+      const addEventListener = input.addEventListener
+      let onInput
+      input.addEventListener = function (type, listener, options) {
+        if (type === 'input') onInput = listener
+        return addEventListener.call(this, type, listener, options)
+      }
+      document.body.append(expander)
+      input.addEventListener = addEventListener
+      const menu = document.createElement('ul')
+      menu.append(document.createElement('li'))
+      expander.addEventListener('text-expander-change', event => {
+        event.detail.provide({matched: true, fragment: menu})
+      })
+      expander.addEventListener('text-expander-activate', () => expander.remove(), {once: true})
+      input.focus()
+      input.value = ':'
+      input.setSelectionRange(1, 1)
+      await onInput(new Event('input'))
+      assert.isFalse(expander.isConnected)
+      assert.isNull(expander.querySelector('ul'))
+      assert.notEqual(input.getAttribute('aria-expanded'), 'true')
+    })
+
+    it('deactivates only once when a deactivation listener disconnects the element', async function () {
+      const expander = document.querySelector('text-expander')
+      const input = expander.querySelector('textarea')
+      const menu = document.createElement('ul')
+      menu.append(document.createElement('li'))
+      expander.addEventListener('text-expander-change', event => {
+        event.detail.provide({matched: true, fragment: menu})
+      })
+      input.focus()
+      triggerInput(input, ':')
+      await waitForAnimationFrame()
+      let deactivations = 0
+      expander.addEventListener('text-expander-deactivate', () => {
+        deactivations++
+        expander.remove()
+      })
+      assert.doesNotThrow(() => expander.dismiss())
+      assert.equal(deactivations, 1)
+      assert.isNull(expander.querySelector('ul'))
+    })
+
+    for (const reconnect of [false, true]) {
+      it(`stops menu replacement when deactivation disconnects${reconnect ? ' and reconnects' : ''}`, async function () {
+        const expander = document.querySelector('text-expander')
+        const input = expander.querySelector('textarea')
+        expander.addEventListener('text-expander-change', event => {
+          const menu = document.createElement('ul')
+          menu.append(document.createElement('li'))
+          event.detail.provide({matched: true, fragment: menu})
+        })
+        input.focus()
+        triggerInput(input, ':')
+        await waitForAnimationFrame()
+        assert.exists(expander.querySelector('ul'))
+        let activations = 0
+        expander.addEventListener('text-expander-activate', () => activations++)
+        expander.addEventListener(
+          'text-expander-deactivate',
+          () => {
+            expander.remove()
+            if (reconnect) {
+              document.body.append(expander)
+              input.focus()
+            }
+          },
+          {once: true}
+        )
+        triggerInput(input, ':new')
+        await waitForAnimationFrame()
+        assert.equal(activations, 0)
+        assert.isNull(expander.querySelector('ul'))
+        assert.notEqual(input.getAttribute('aria-expanded'), 'true')
+        if (reconnect) {
+          triggerInput(input, ':next')
+          await waitForAnimationFrame()
+          assert.equal(activations, 1)
+          assert.exists(expander.querySelector('ul'))
+          expander.dismiss()
+          assert.isNull(expander.querySelector('ul'))
+        }
+      })
+    }
+
+    it('detaches old input handlers before deactivation reconnects and types', async function () {
+      const expander = document.querySelector('text-expander')
+      const input = expander.querySelector('textarea')
+      let requests = 0
+      expander.addEventListener('text-expander-change', event => {
+        requests++
+        const menu = document.createElement('ul')
+        menu.append(document.createElement('li'))
+        event.detail.provide({matched: true, fragment: menu})
+      })
+      input.focus()
+      triggerInput(input, ':')
+      await waitForAnimationFrame()
+      expander.querySelector('ul').dispatchEvent(new MouseEvent('mousedown'))
+      requests = 0
+      expander.addEventListener(
+        'text-expander-deactivate',
+        () => {
+          document.body.append(expander)
+          input.focus()
+          triggerInput(input, ':new')
+        },
+        {once: true}
+      )
+      expander.remove()
+      await waitForAnimationFrame()
+      assert.equal(requests, 1)
+      assert.equal(expander.querySelectorAll('ul').length, 1)
+      expander.dismiss()
+      assert.isNull(expander.querySelector('ul'))
+    })
+
+    it('removes the active menu and combobox state when disconnected', async function () {
+      const expander = document.querySelector('text-expander')
+      const input = expander.querySelector('textarea')
+      const menu = document.createElement('ul')
+      const item = document.createElement('li')
+      item.setAttribute('role', 'option')
+      menu.append(item)
+      expander.addEventListener('text-expander-change', event => {
+        event.detail.provide({matched: true, fragment: menu})
+      })
+      input.focus()
+      triggerInput(input, ':')
+      await waitForAnimationFrame()
+      assert.equal(input.getAttribute('aria-expanded'), 'true')
+
+      menu.dispatchEvent(new MouseEvent('mousedown'))
+      expander.remove()
+      assert.isNull(expander.querySelector('ul'))
+      assert.notEqual(input.getAttribute('aria-expanded'), 'true')
+
+      document.body.append(expander)
+      input.focus()
+      triggerInput(input, ':new')
+      await waitForAnimationFrame()
+      assert.exists(expander.querySelector('ul'))
+    })
+
+    it('keeps the new instance usable when deactivation reconnects the element', async function () {
+      const expander = document.querySelector('text-expander')
+      const input = expander.querySelector('textarea')
+      const menu = document.createElement('ul')
+      menu.append(document.createElement('li'))
+      expander.addEventListener('text-expander-change', event => {
+        event.detail.provide({matched: true, fragment: menu})
+      })
+      input.focus()
+      triggerInput(input, ':')
+      await waitForAnimationFrame()
+      menu.dispatchEvent(new MouseEvent('mousedown'))
+      expander.addEventListener(
+        'text-expander-deactivate',
+        () => {
+          document.body.append(expander)
+        },
+        {once: true}
+      )
+
+      expander.remove()
+      assert.isTrue(expander.isConnected)
+      input.focus()
+      triggerInput(input, ':new')
+      await waitForAnimationFrame()
+      assert.exists(expander.querySelector('ul'))
+      expander.dismiss()
+      assert.isNull(expander.querySelector('ul'))
+    })
+
+    it('does not reactivate a disconnected instance after its provider resolves', async function () {
+      const expander = document.querySelector('text-expander')
+      const input = expander.querySelector('textarea')
+      const menu = document.createElement('ul')
+      menu.append(document.createElement('li'))
+      let resolveProvider
+      const pending = new Promise(resolve => {
+        resolveProvider = resolve
+      })
+      expander.addEventListener(
+        'text-expander-change',
+        event => {
+          event.detail.provide(pending)
+        },
+        {once: true}
+      )
+      input.focus()
+      triggerInput(input, ':')
+      expander.remove()
+      document.body.append(expander)
+      input.focus()
+
+      resolveProvider({matched: true, fragment: menu})
+      await pending
+      await waitForAnimationFrame()
+      assert.isNull(expander.querySelector('ul'))
+      assert.notEqual(input.getAttribute('aria-expanded'), 'true')
+    })
+
     it('dispatches change events for 2 char activation keys', async function () {
       const expander = document.querySelector('text-expander')
       const input = expander.querySelector('textarea')

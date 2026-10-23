@@ -70,6 +70,8 @@ class TextExpander {
     this.input.removeEventListener('input', this.oninput)
     ;(this.input as HTMLElement).removeEventListener('keydown', this.onkeydown)
     this.input.removeEventListener('blur', this.onblur)
+    this.match = null
+    this.deactivate()
   }
 
   dismissMenu() {
@@ -84,6 +86,7 @@ class TextExpander {
     }
 
     this.deactivate()
+    if (states.get(this.expander) !== this) return
     this.menu = menu
 
     if (!menu.id) menu.id = `text-expander-${Math.floor(Math.random() * 100000).toString()}`
@@ -91,6 +94,7 @@ class TextExpander {
     this.combobox = new Combobox(this.input, menu)
 
     this.expander.dispatchEvent(new Event('text-expander-activate'))
+    if (!this.combobox || this.menu !== menu) return
 
     this.positionMenu(menu, match.position)
 
@@ -127,17 +131,17 @@ class TextExpander {
 
   private deactivate() {
     const menu = this.menu
-    if (!menu || !this.combobox) return false
+    const combobox = this.combobox
+    if (!menu || !combobox) return false
+    this.menu = null
+    this.combobox = null
 
     this.expander.dispatchEvent(new Event('text-expander-deactivate'))
-
-    this.menu = null
 
     menu.removeEventListener('combobox-commit', this.oncommit)
     menu.removeEventListener('mousedown', this.onmousedown)
 
-    this.combobox.destroy()
-    this.combobox = null
+    combobox.destroy()
     menu.remove()
 
     return true
@@ -310,8 +314,8 @@ export default class TextExpanderElement extends HTMLElement {
   disconnectedCallback(): void {
     const state: TextExpander = states.get(this)
     if (!state) return
-    state.destroy()
     states.delete(this)
+    state.destroy()
   }
 
   dismiss(): void {
