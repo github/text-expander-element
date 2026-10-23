@@ -86,6 +86,7 @@ class TextExpander {
     }
 
     this.deactivate()
+    if (states.get(this.expander) !== this) return
     this.menu = menu
 
     if (!menu.id) menu.id = `text-expander-${Math.floor(Math.random() * 100000).toString()}`
